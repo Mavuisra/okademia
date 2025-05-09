@@ -1,0 +1,945 @@
+{% extends 'belletin/base.html' %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #0ef0a5;
+        --accent-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --stat-blue: #2196F3;
+        --stat-green: #4CAF50;
+        --stat-orange: #FF9800;
+        --stat-red: #F44336;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .welcome-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    /* Navigation latérale */
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+    }
+
+    .sidebar {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        height: fit-content;
+    }
+
+    .sidebar-profile {
+        padding: 1.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+    }
+
+    .profile-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid white;
+        margin-bottom: 1rem;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-menu {
+        padding: 1rem 0;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover {
+        background-color: #f5f7fa;
+        color: var(--primary-color);
+        border-left-color: var(--secondary-color);
+    }
+
+    .menu-item.active {
+        background-color: #f0f7ff;
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .menu-item i, 
+    .menu-item span:first-child {
+        margin-right: 12px;
+        font-size: 1.1rem;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    /* Controls bar */
+    .controls-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .filters-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background: white;
+        color: #333;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    .filter-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        outline: none;
+    }
+
+    .view-toggle {
+        display: flex;
+        background: #f5f7fa;
+        border-radius: 8px;
+        padding: 4px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .view-toggle-btn {
+        background: none;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .view-toggle-btn.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .view-toggle-btn:hover:not(.active) {
+        background: #e0e0e0;
+    }
+
+    /* Courses Container */
+    .courses-container {
+        overflow: hidden;
+    }
+
+    /* Course Grid View */
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Course Card */
+    .course-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s;
+        position: relative;
+        height: 100%;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+
+    /* Course Header */
+    .course-header {
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    /* Different color schemes for different subjects */
+    .course-header.math {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+    }
+
+    .course-header.science {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+
+    .course-header.language {
+        background: linear-gradient(135deg, #f77062, #fe5196);
+    }
+
+    .course-header.programming {
+        background: linear-gradient(135deg, #ff9a44, #fc6076);
+    }
+
+    .course-header.default {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+    }
+
+    .course-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.3;
+    }
+
+    .course-code {
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        opacity: 0.8;
+        margin-top: 0.75rem;
+    }
+
+    .course-header small {
+        opacity: 0.9;
+        font-size: 1rem;
+        font-weight: 500;
+        display: block;
+        margin-top: 0.5rem;
+    }
+
+    /* Course Body */
+    .course-body {
+        padding: 1.5rem;
+    }
+
+    .course-meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .meta-item i {
+        color: var(--accent-color);
+        font-size: 1.1rem;
+    }
+
+    /* Progress Bar */
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+
+    /* Course Stats */
+    .course-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: #f5f7fa;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .stat-item:hover {
+        background: #e9f0f8;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* Course Actions */
+    .course-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    /* List View */
+    .courses-list {
+        display: none;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .course-list-item {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s;
+        display: flex;
+        position: relative;
+    }
+
+    .course-list-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-item-header {
+        width: 250px;
+        flex-shrink: 0;
+        padding: 1.5rem;
+        position: relative;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Different color schemes for list view */
+    .list-item-header.math {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+    }
+
+    .list-item-header.science {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+
+    .list-item-header.language {
+        background: linear-gradient(135deg, #f77062, #fe5196);
+    }
+
+    .list-item-header.programming {
+        background: linear-gradient(135deg, #ff9a44, #fc6076);
+    }
+
+    .list-item-header.default {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+    }
+
+    .list-item-header h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .list-item-content {
+        flex: 1;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .list-item-info {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .list-item-stats {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .list-item-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+    }
+
+    .list-item-stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .list-item-stat-label {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .list-item-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-left: auto;
+    }
+
+    /* Empty State */
+    .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .empty-state h3 {
+        color: #333;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .empty-state p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+        transform: translateY(-2px);
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .pagination-item {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: white;
+        color: #333;
+        font-weight: 600;
+        box-shadow: var(--card-shadow);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .pagination-item.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .pagination-item:hover:not(.active):not(.disabled) {
+        background: #f5f7fa;
+        transform: translateY(-2px);
+    }
+
+    .pagination-item.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Media Queries */
+    @media (max-width: 1200px) {
+        .list-item-content {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .courses-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .course-list-item {
+            flex-direction: column;
+        }
+        
+        .list-item-header {
+            width: 100%;
+        }
+        
+        .list-item-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .list-item-stats {
+            width: 100%;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+        
+        .list-item-actions {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .controls-bar {
+            flex-direction: column;
+        }
+        
+        .view-toggle {
+            align-self: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Gestion des Notes</h2>
+            <p class="welcome-message">Bienvenue, {{ professor.user.get_full_name }}</p>
+        </div>
+        <div class="view-toggle">
+            <button id="grid-view-btn" class="view-toggle-btn active">
+                <i class="fas fa-th-large"></i>
+            </button>
+            <button id="list-view-btn" class="view-toggle-btn">
+                <i class="fas fa-list"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Navigation latérale -->
+        <div class="sidebar">
+            <div class="sidebar-profile">
+                <img src="https://via.placeholder.com/100" alt="Profile" class="profile-image">
+                <h3>{{ professor.user.get_full_name }}</h3>
+                <p>{{ professor.department }}</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="{% url 'belletin:professor_dashboard' %}" class="menu-item">
+                    <i class="fas fa-chart-line"></i> Tableau de bord
+                </a>
+                <a href="{% url 'belletin:professor_grades' %}" class="menu-item active">
+                    <i class="fas fa-edit"></i> Saisie des notes
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-calendar-alt"></i> Planning des cours
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-file-alt"></i> Rapports
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-cog"></i> Paramètres
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div>
+            <!-- Controls bar with filters -->
+            <div class="controls-bar">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label for="semester-filter">Semestre</label>
+                        <select id="semester-filter" class="filter-select">
+                            <option value="all">Tous les semestres</option>
+                            <option value="S1">Semestre 1</option>
+                            <option value="S2">Semestre 2</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="year-filter">Promotion</label>
+                        <select id="year-filter" class="filter-select">
+                            <option value="all">Toutes les promotions</option>
+                            <option value="L1">Licence 1</option>
+                            <option value="L2">Licence 2</option>
+                            <option value="L3">Licence 3</option>
+                            <option value="M1">Master 1</option>
+                            <option value="M2">Master 2</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="courses-container">
+                <!-- Grid View -->
+                <div class="courses-grid" id="grid-view">
+                    {% for course in courses %}
+                    <div class="course-card" data-page="1">
+                        {% if course.semester %}
+                        <div class="course-badge">{{ course.semester }}</div>
+                        {% endif %}
+                        <div class="course-header {% if course.ue.category %}{{ course.ue.category|slugify }}{% else %}default{% endif %}">
+                            <h2 class="course-name">{{ course.ue.name }}</h2>
+                            <small>{{ course.ue.promotion }}</small>
+                            <div class="course-code">Code: {{ course.ue.code|default:"UE" }}</div>
+                        </div>
+                        <div class="course-body">
+                            <div class="course-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>{{ course.ue.credits }} Crédits</span>
+                                </div>
+                                {% if course.ue.semester %}
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ course.ue.semester }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: {{ course.completion_rate }}%"></div>
+                            </div>
+
+                            <div class="course-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ course.students_count }}</div>
+                                    <div class="stat-label">Étudiants</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ course.completion_rate }}%</div>
+                                    <div class="stat-label">Complété</div>
+                                </div>
+                            </div>
+                            <div class="course-actions">
+                                <a href="{% url 'belletin:quick_grade' course.id %}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Saisir
+                                </a>
+                                <a href="{% url 'belletin:professor_dashboard' %}" class="btn btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <h3>Aucun cours assigné</h3>
+                        <p>Vous n'avez pas encore de cours assignés pour cette période académique.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- List View -->
+                <div class="courses-list" id="list-view" style="display: none;">
+                    {% for course in courses %}
+                    <div class="course-list-item" data-page="1">
+                        {% if course.semester %}
+                        <div class="course-badge">{{ course.semester }}</div>
+                        {% endif %}
+                        <div class="list-item-header {% if course.ue.category %}{{ course.ue.category|slugify }}{% else %}default{% endif %}">
+                            <h3>{{ course.ue.name }}</h3>
+                            <small>{{ course.ue.promotion }}</small>
+                            <small class="course-code">Code: {{ course.ue.code|default:"UE" }}</small>
+                        </div>
+                        <div class="list-item-content">
+                            <div class="list-item-info">
+                                <div class="course-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        <span>{{ course.ue.credits }} Crédits</span>
+                                    </div>
+                                    {% if course.ue.semester %}
+                                    <div class="meta-item">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>{{ course.ue.semester }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: {{ course.completion_rate }}%"></div>
+                                </div>
+                            </div>
+                            <div class="list-item-stats">
+                                <div class="list-item-stat">
+                                    <div class="list-item-stat-value">{{ course.students_count }}</div>
+                                    <div class="list-item-stat-label">Étudiants</div>
+                                </div>
+                                <div class="list-item-stat">
+                                    <div class="list-item-stat-value">{{ course.completion_rate }}%</div>
+                                    <div class="list-item-stat-label">Complété</div>
+                                </div>
+                            </div>
+                            <div class="list-item-actions">
+                                <a href="{% url 'belletin:quick_grade' course.id %}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Saisir
+                                </a>
+                                <a href="{% url 'belletin:professor_dashboard' %}" class="btn btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <h3>Aucun cours assigné</h3>
+                        <p>Vous n'avez pas encore de cours assignés pour cette période académique.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-item" id="prev-page">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active" data-page="1">1</div>
+                    <div class="pagination-item" data-page="2">2</div>
+                    <div class="pagination-item" data-page="3">3</div>
+                    <div class="pagination-item" id="next-page">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // View toggle functionality
+        const gridViewBtn = document.getElementById('grid-view-btn');
+        const listViewBtn = document.getElementById('list-view-btn');
+        const gridView = document.getElementById('grid-view');
+        const listView = document.getElementById('list-view');
+
+        gridViewBtn.addEventListener('click', function() {
+            gridView.style.display = 'grid';
+            listView.style.display = 'none';
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+        });
+
+        listViewBtn.addEventListener('click', function() {
+            gridView.style.display = 'none';
+            listView.style.display = 'flex';
+            listViewBtn.classList.add('active');
+            gridViewBtn.classList.remove('active');
+        });
+
+        // Pagination functionality
+        const itemsPerPage = 6;
+        const paginationItems = document.querySelectorAll('.pagination-item[data-page]');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        let currentPage = 1;
+
+        // Function to show items for current page
+        function showItemsForPage(page) {
+            // Update active pagination item
+            paginationItems.forEach(item => {
+                if (parseInt(item.dataset.page) === page) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Show/hide grid items
+            const gridItems = document.querySelectorAll('#grid-view .course-card');
+            gridItems.forEach((item, index) => {
+                const itemPage = Math.floor(index / itemsPerPage) + 1;
+                item.dataset.page = itemPage;
+                item.style.display = itemPage === page ? 'block' : 'none';
+            });
+
+            // Show/hide list items
+            const listItems = document.querySelectorAll('#list-view .course-list-item');
+            listItems.forEach((item, index) => {
+                const itemPage = Math.floor(index / itemsPerPage) + 1;
+                item.dataset.page = itemPage;
+                item.style.display = itemPage === page ? 'flex' : 'none';
+            });
+
+            // Update prev/next buttons
+            prevPageBtn.classList.toggle('disabled', page === 1);
+            const maxPage = Math.ceil(gridItems.length / itemsPerPage);
+            nextPageBtn.classList.toggle('disabled', page === maxPage || maxPage === 0);
+        }
+
+        // Add click handlers for pagination
+        paginationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                currentPage = parseInt(this.dataset.page);
+                showItemsForPage(currentPage);
+            });
+        });
+
+        prevPageBtn.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                showItemsForPage(currentPage);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', function() {
+            const maxPage = Math.ceil(document.querySelectorAll('#grid-view .course-card').length / itemsPerPage);
+            if (currentPage < maxPage) {
+                currentPage++;
+                showItemsForPage(currentPage);
+            }
+        });
+
+        // Initial pagination
+        showItemsForPage(currentPage);
+    });
+</script>
+{% endblock %} 

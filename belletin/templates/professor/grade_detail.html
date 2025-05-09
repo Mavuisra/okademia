@@ -1,0 +1,609 @@
+{% extends "belletin/base.html" %}
+
+{% block extra_head %}
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition-speed: 0.3s;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.875rem;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        margin-right: 0.5rem;
+    }
+
+    .breadcrumb-item::after {
+        content: "/";
+        margin-left: 0.5rem;
+        color: #aaa;
+    }
+
+    .breadcrumb-item:last-child::after {
+        content: "";
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #eee;
+    }
+
+    .student-info {
+        display: flex;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        margin-right: 2rem;
+        min-width: 150px;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .grade-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .grade-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .grade-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .grade-badge {
+        font-size: 1.25rem;
+        font-weight: 700;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+    }
+
+    .component-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .component-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .component-name {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .component-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .timeline {
+        margin-top: 2rem;
+        position: relative;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 20px;
+        width: 2px;
+        background: #eee;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+        padding-left: 60px;
+    }
+
+    .timeline-icon {
+        position: absolute;
+        left: 11px;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--secondary-color);
+        border: 2px solid white;
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-text {
+        margin: 0;
+        color: #666;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all var(--transition-speed);
+        cursor: pointer;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #f8fafc;
+        color: #333;
+        border: 1px solid #e1e5eb;
+    }
+
+    .btn-secondary:hover {
+        background: #e1e5eb;
+        color: #000;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .grade-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .grade-row {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .grade-input {
+        width: 100px;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: 500;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+
+    /* Styles pour les alertes */
+    .alert {
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .alert-info {
+        background-color: #e6f4ff;
+        border: 1px solid #91caff;
+        color: #0958d9;
+    }
+
+    .alert-warning {
+        background-color: #fffbe6;
+        border: 1px solid #ffe58f;
+        color: #ad8b00;
+    }
+
+    .alert-success {
+        background-color: #f6ffed;
+        border: 1px solid #b7eb8f;
+        color: #389e0d;
+    }
+
+    .alert-danger {
+        background-color: #fff2f0;
+        border: 1px solid #ffccc7;
+        color: #cf1322;
+    }
+
+    .alert-icon {
+        font-size: 1.5rem;
+    }
+
+    /* Fix pour rendre table plus responsive */
+    .table-responsive {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #333;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Styles responsifs */
+    @media (max-width: 1200px) {
+        .container {
+            max-width: 100%;
+            padding: 1.5rem;
+        }
+        
+        .component-list {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .grade-form {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        .info-item {
+            margin-right: 1.5rem;
+        }
+        
+        .actions {
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.25rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .component-list {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+        
+        .grade-form {
+            grid-template-columns: 1fr;
+        }
+        
+        .student-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .info-item {
+            margin-right: 0;
+        }
+        
+        .grade-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .timeline-item {
+            padding-left: 50px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .component-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .grade-badge {
+            font-size: 1.1rem;
+            padding: 0.4rem 0.9rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+        }
+        
+        .grade-title {
+            font-size: 1rem;
+        }
+        
+        .timeline::before {
+            left: 15px;
+        }
+        
+        .timeline-icon {
+            left: 6px;
+        }
+        
+        .timeline-item {
+            padding-left: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Détail des Notes</h2>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'belletin:professor_dashboard' %}">Tableau de bord</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'belletin:quick_grade' course.id %}">Notes - {{ course.ue.name }}</a></li>
+                <li class="breadcrumb-item">{{ student.user.get_full_name }}</li>
+            </ul>
+        </div>
+        <a href="{% url 'belletin:quick_grade' course.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">Informations de l'étudiant</h3>
+            
+            <div class="student-info">
+                <div class="info-item">
+                    <div class="info-label">Matricule</div>
+                    <div class="info-value">{{ student.matricule }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nom complet</div>
+                    <div class="info-value">{{ student.user.get_full_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Promotion</div>
+                    <div class="info-value">{{ student.promotion }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Année académique</div>
+                    <div class="info-value">{{ student.promotion.academic_year }}</div>
+                </div>
+            </div>
+            
+            <div class="grade-card">
+                <div class="grade-header">
+                    <h4 class="grade-title">Note totale - {{ course.ue.name }}</h4>
+                    {% if total_score is not None %}
+                    <span class="grade-badge">{{ total_score }}/20</span>
+                    {% else %}
+                    <span class="grade-badge" style="background: #999;">Non complète</span>
+                    {% endif %}
+                </div>
+                
+                <div class="component-list">
+                    {% for component in grade_components %}
+                    <div class="component-item">
+                        <div class="component-name">{{ component.type }}</div>
+                        <div class="component-value">
+                            {% if component.score is not None %}
+                                {{ component.score }}
+                                {% if component.type == 'TP' or component.type == 'INTERROGATION' %}/5{% endif %}
+                                {% if component.type == 'EXAMEN' %}/10{% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>Aucune note enregistrée</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <h3 class="card-title">Historique des modifications</h3>
+            
+            <div class="timeline">
+                {% for log in modification_logs %}
+                <div class="timeline-item">
+                    <div class="timeline-icon"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">{{ log.modified_at|date:"d/m/Y H:i" }}</div>
+                        <p class="timeline-text">
+                            <strong>{{ log.modified_by.get_full_name }}</strong> a modifié la note "{{ log.component.type }}" 
+                            de {{ log.old_value|default:"aucune valeur" }} à {{ log.new_value }}.
+                        </p>
+                    </div>
+                </div>
+                {% empty %}
+                <p>Aucune modification enregistrée</p>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4">
+                <a href="{% url 'belletin:quick_grade' course.id %}?edit={{ student.id }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Modifier les notes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

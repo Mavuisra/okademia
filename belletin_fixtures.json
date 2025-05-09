@@ -1,0 +1,907 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "admin@example.com",
+      "first_name": "Admin",
+      "last_name": "Système",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "date_joined": "2023-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "prof1",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "prof1@example.com",
+      "first_name": "Jean",
+      "last_name": "Dupont",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "jury_president",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "president@example.com",
+      "first_name": "Pierre",
+      "last_name": "Martin",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "username": "jury_member",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "membre@example.com",
+      "first_name": "Sophie",
+      "last_name": "Leclerc",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-01T11:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "username": "etudiant1",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "etudiant1@example.com",
+      "first_name": "Marie",
+      "last_name": "Dubois",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-02T08:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "username": "etudiant2",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "etudiant2@example.com",
+      "first_name": "Luc",
+      "last_name": "Leblanc",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-02T09:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 7,
+    "fields": {
+      "username": "etudiant3",
+      "password": "pbkdf2_sha256$600000$h3PnULYgEcEK5M32gvGcAg$d9ZHYxvulRPEzQWUU+eIHd5VZkYf/k50HmtZr0Mw2PA=",
+      "email": "etudiant3@example.com",
+      "first_name": "Thomas",
+      "last_name": "Moreau",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-09-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "belletin.faculty",
+    "pk": 1,
+    "fields": {
+      "name": "Sciences"
+    }
+  },
+  {
+    "model": "belletin.department",
+    "pk": 1,
+    "fields": {
+      "name": "Informatique",
+      "faculty": 1
+    }
+  },
+  {
+    "model": "belletin.promotion",
+    "pk": 1,
+    "fields": {
+      "level": "L1",
+      "department": 1,
+      "academic_year": 1
+    }
+  },
+  {
+    "model": "belletin.promotion",
+    "pk": 2,
+    "fields": {
+      "level": "L2",
+      "department": 1,
+      "academic_year": 1
+    }
+  },
+  {
+    "model": "belletin.promotion",
+    "pk": 3,
+    "fields": {
+      "level": "L3",
+      "department": 1,
+      "academic_year": 1
+    }
+  },
+  {
+    "model": "belletin.professor",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "department": 1
+    }
+  },
+  {
+    "model": "belletin.jurymember",
+    "pk": 1,
+    "fields": {
+      "user": 3,
+      "is_president": true,
+      "promotions": [1, 2, 3]
+    }
+  },
+  {
+    "model": "belletin.jurymember",
+    "pk": 2,
+    "fields": {
+      "user": 4,
+      "is_president": false,
+      "promotions": [1]
+    }
+  },
+  {
+    "model": "belletin.student",
+    "pk": 1,
+    "fields": {
+      "user": 5,
+      "matricule": "L1-INFO-001",
+      "promotion": 1
+    }
+  },
+  {
+    "model": "belletin.student",
+    "pk": 2,
+    "fields": {
+      "user": 6,
+      "matricule": "L1-INFO-002",
+      "promotion": 1
+    }
+  },
+  {
+    "model": "belletin.student",
+    "pk": 3,
+    "fields": {
+      "user": 7,
+      "matricule": "L1-INFO-003",
+      "promotion": 1
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 1,
+    "fields": {
+      "code": "INF101",
+      "title": "Introduction à l'informatique",
+      "credits": 8,
+      "semester": 1,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 2,
+    "fields": {
+      "code": "INF102",
+      "title": "Algorithmique",
+      "credits": 8,
+      "semester": 1,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 3,
+    "fields": {
+      "code": "MAT101",
+      "title": "Mathématiques pour l'informatique",
+      "credits": 6,
+      "semester": 1,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 4,
+    "fields": {
+      "code": "PHY101",
+      "title": "Physique pour l'informatique",
+      "credits": 5,
+      "semester": 1,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 5,
+    "fields": {
+      "code": "ANG101",
+      "title": "Anglais technique",
+      "credits": 3,
+      "semester": 1,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 6,
+    "fields": {
+      "code": "INF201",
+      "title": "Programmation orientée objet",
+      "credits": 8,
+      "semester": 2,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 7,
+    "fields": {
+      "code": "INF202",
+      "title": "Structures de données",
+      "credits": 8,
+      "semester": 2,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 8,
+    "fields": {
+      "code": "MAT201",
+      "title": "Statistiques et probabilités",
+      "credits": 6,
+      "semester": 2,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 9,
+    "fields": {
+      "code": "RES201",
+      "title": "Introduction aux réseaux",
+      "credits": 5,
+      "semester": 2,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.ue",
+    "pk": 10,
+    "fields": {
+      "code": "WEB201",
+      "title": "Développement Web",
+      "credits": 3,
+      "semester": 2,
+      "promotion": 1,
+      "is_group": false,
+      "parent_ue": null
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 1,
+    "fields": {
+      "ue": 1,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-01-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 2,
+    "fields": {
+      "ue": 2,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-01-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 3,
+    "fields": {
+      "ue": 3,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-01-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 4,
+    "fields": {
+      "ue": 4,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-01-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 5,
+    "fields": {
+      "ue": 5,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-01-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 6,
+    "fields": {
+      "ue": 6,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-06-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 7,
+    "fields": {
+      "ue": 7,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-06-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 8,
+    "fields": {
+      "ue": 8,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-06-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 9,
+    "fields": {
+      "ue": 9,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-06-15"
+    }
+  },
+  {
+    "model": "belletin.course",
+    "pk": 10,
+    "fields": {
+      "ue": 10,
+      "professor": 1,
+      "academic_year": 1,
+      "is_active": true,
+      "deadline": "2024-06-15"
+    }
+  },
+  {
+    "model": "belletin.deliberation",
+    "pk": 1,
+    "fields": {
+      "promotion": 1,
+      "semester": 1,
+      "academic_year": 1,
+      "date_scheduled": "2024-02-15T10:00:00Z",
+      "date_completed": null,
+      "status": "PENDING"
+    }
+  },
+  {
+    "model": "belletin.deliberation",
+    "pk": 2,
+    "fields": {
+      "promotion": 1,
+      "semester": 2,
+      "academic_year": 1,
+      "date_scheduled": "2024-07-15T10:00:00Z",
+      "date_completed": null,
+      "status": "PENDING"
+    }
+  },
+  {
+    "model": "belletin.deliberationmember",
+    "pk": 1,
+    "fields": {
+      "deliberation": 1,
+      "jury_member": 1,
+      "is_present": true
+    }
+  },
+  {
+    "model": "belletin.deliberationmember",
+    "pk": 2,
+    "fields": {
+      "deliberation": 1,
+      "jury_member": 2,
+      "is_present": true
+    }
+  },
+  {
+    "model": "belletin.deliberationmember",
+    "pk": 3,
+    "fields": {
+      "deliberation": 2,
+      "jury_member": 1,
+      "is_present": true
+    }
+  },
+  {
+    "model": "belletin.deliberationmember",
+    "pk": 4,
+    "fields": {
+      "deliberation": 2,
+      "jury_member": 2,
+      "is_present": true
+    }
+  },
+  
+  {
+    "model": "belletin.academicyear",
+    "pk": 1,
+    "fields": {
+      "year": "2023-09-01"
+    }
+  },
+  
+  {
+    "model": "belletin.grade",
+    "pk": 1,
+    "fields": {
+      "student": 1,
+      "ue": 1,
+      "cc": 15.0,
+      "mc": 14.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 2,
+    "fields": {
+      "student": 1,
+      "ue": 2,
+      "cc": 13.0,
+      "mc": 16.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 3,
+    "fields": {
+      "student": 1,
+      "ue": 3,
+      "cc": 14.0,
+      "mc": 13.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 4,
+    "fields": {
+      "student": 1,
+      "ue": 4,
+      "cc": 12.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 5,
+    "fields": {
+      "student": 1,
+      "ue": 5,
+      "cc": 16.0,
+      "mc": 18.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 6,
+    "fields": {
+      "student": 1,
+      "ue": 6,
+      "cc": 13.0,
+      "mc": 14.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 7,
+    "fields": {
+      "student": 1,
+      "ue": 7,
+      "cc": 15.0,
+      "mc": 14.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 8,
+    "fields": {
+      "student": 1,
+      "ue": 8,
+      "cc": 12.0,
+      "mc": 14.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 9,
+    "fields": {
+      "student": 1,
+      "ue": 9,
+      "cc": 13.0,
+      "mc": 15.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 10,
+    "fields": {
+      "student": 1,
+      "ue": 10,
+      "cc": 17.0,
+      "mc": 16.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 11,
+    "fields": {
+      "student": 2,
+      "ue": 1,
+      "cc": 10.0,
+      "mc": 9.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 12,
+    "fields": {
+      "student": 2,
+      "ue": 2,
+      "cc": 8.0,
+      "mc": 7.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 13,
+    "fields": {
+      "student": 2,
+      "ue": 3,
+      "cc": 11.0,
+      "mc": 10.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 14,
+    "fields": {
+      "student": 2,
+      "ue": 4,
+      "cc": 9.0,
+      "mc": 8.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 15,
+    "fields": {
+      "student": 2,
+      "ue": 5,
+      "cc": 12.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 16,
+    "fields": {
+      "student": 2,
+      "ue": 6,
+      "cc": 11.0,
+      "mc": 12.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 17,
+    "fields": {
+      "student": 2,
+      "ue": 7,
+      "cc": 10.0,
+      "mc": 8.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 18,
+    "fields": {
+      "student": 2,
+      "ue": 8,
+      "cc": 9.0,
+      "mc": 10.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 19,
+    "fields": {
+      "student": 2,
+      "ue": 9,
+      "cc": 11.0,
+      "mc": 13.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 20,
+    "fields": {
+      "student": 2,
+      "ue": 10,
+      "cc": 12.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 21,
+    "fields": {
+      "student": 3,
+      "ue": 1,
+      "cc": 7.0,
+      "mc": 8.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 22,
+    "fields": {
+      "student": 3,
+      "ue": 2,
+      "cc": 9.0,
+      "mc": 6.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 23,
+    "fields": {
+      "student": 3,
+      "ue": 3,
+      "cc": 10.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 24,
+    "fields": {
+      "student": 3,
+      "ue": 4,
+      "cc": 9.0,
+      "mc": 7.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 25,
+    "fields": {
+      "student": 3,
+      "ue": 5,
+      "cc": 12.0,
+      "mc": 13.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 26,
+    "fields": {
+      "student": 3,
+      "ue": 6,
+      "cc": 10.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 27,
+    "fields": {
+      "student": 3,
+      "ue": 7,
+      "cc": 11.0,
+      "mc": 12.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 28,
+    "fields": {
+      "student": 3,
+      "ue": 8,
+      "cc": 10.0,
+      "mc": 9.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 29,
+    "fields": {
+      "student": 3,
+      "ue": 9,
+      "cc": 8.0,
+      "mc": 9.0
+    }
+  },
+  {
+    "model": "belletin.grade",
+    "pk": 30,
+    "fields": {
+      "student": 3,
+      "ue": 10,
+      "cc": 10.0,
+      "mc": 11.0
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 1,
+    "fields": {
+      "deliberation": 1,
+      "student": 1,
+      "average": 14.36,
+      "credits_obtained": 30,
+      "auto_decision": "ADMITTED",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 2,
+    "fields": {
+      "deliberation": 1,
+      "student": 2,
+      "average": 9.5,
+      "credits_obtained": 14,
+      "auto_decision": "REMEDIAL",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 3,
+    "fields": {
+      "deliberation": 1,
+      "student": 3,
+      "average": 9.35,
+      "credits_obtained": 9,
+      "auto_decision": "REMEDIAL",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 4,
+    "fields": {
+      "deliberation": 2,
+      "student": 1,
+      "average": 14.0,
+      "credits_obtained": 30,
+      "auto_decision": "ADMITTED",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 5,
+    "fields": {
+      "deliberation": 2,
+      "student": 2,
+      "average": 10.55,
+      "credits_obtained": 22,
+      "auto_decision": "ADMITTED",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  },
+  {
+    "model": "belletin.studentdeliberation",
+    "pk": 6,
+    "fields": {
+      "deliberation": 2,
+      "student": 3,
+      "average": 10.05,
+      "credits_obtained": 17,
+      "auto_decision": "ADMITTED",
+      "final_decision": null,
+      "validated": false,
+      "validated_by": null,
+      "validated_at": null,
+      "comments": ""
+    }
+  }
+] 

@@ -1,0 +1,300 @@
+{% extends "belletin/base.html" %}
+
+{% block title %}État de synchronisation hors ligne{% endblock %}
+
+{% block extra_head %}
+<style>
+    .card {
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 1.2rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .stat-pending {
+        background-color: #f8f9fa;
+    }
+    
+    .stat-processing {
+        background-color: #e9f5fe;
+    }
+    
+    .stat-completed {
+        background-color: #e9fff0;
+    }
+    
+    .stat-failed {
+        background-color: #fff5f5;
+    }
+    
+    .operation-create {
+        color: #28a745;
+    }
+    
+    .operation-update {
+        color: #007bff;
+    }
+    
+    .operation-delete {
+        color: #dc3545;
+    }
+    
+    .status-pending {
+        background-color: #f8f9fa;
+    }
+    
+    .status-processing {
+        background-color: #e9f5fe;
+    }
+    
+    .status-completed {
+        background-color: #e9fff0;
+    }
+    
+    .status-failed {
+        background-color: #fff5f5;
+    }
+    
+    .action-button {
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    
+    .data-preview {
+        max-height: 100px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 0.8rem;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">État de synchronisation hors ligne</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">À propos de cette page</h5>
+            <p class="card-text">
+                Cette page affiche les opérations effectuées en mode hors ligne qui sont en attente de synchronisation ou qui ont été synchronisées récemment.
+                La synchronisation se fait automatiquement lorsque vous retrouvez une connexion Internet.
+            </p>
+            <p>
+                <button class="btn btn-primary" onclick="synchronizeNow()">
+                    <i class="fas fa-sync-alt"></i> Synchroniser maintenant
+                </button>
+            </p>
+        </div>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-card stat-pending">
+            <div class="stat-value">{{ stats.pending }}</div>
+            <div class="stat-label">En attente</div>
+        </div>
+        <div class="stat-card stat-processing">
+            <div class="stat-value">{{ stats.processing }}</div>
+            <div class="stat-label">En cours</div>
+        </div>
+        <div class="stat-card stat-completed">
+            <div class="stat-value">{{ stats.completed }}</div>
+            <div class="stat-label">Terminées</div>
+        </div>
+        <div class="stat-card stat-failed">
+            <div class="stat-value">{{ stats.failed }}</div>
+            <div class="stat-label">Échouées</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Liste des opérations</h5>
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active" onclick="filterItems('all')">Tout</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="filterItems('pending')">En attente</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="filterItems('completed')">Terminées</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="filterItems('failed')">Échouées</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Opération</th>
+                            <th>Modèle</th>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in pending_items %}
+                        <tr class="item-row status-{{ item.status|lower }}">
+                            <td>
+                                {% if item.operation_type == 'CREATE' %}
+                                <span class="badge bg-success operation-create">Création</span>
+                                {% elif item.operation_type == 'UPDATE' %}
+                                <span class="badge bg-primary operation-update">Mise à jour</span>
+                                {% elif item.operation_type == 'DELETE' %}
+                                <span class="badge bg-danger operation-delete">Suppression</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.model_name }}</td>
+                            <td>{{ item.object_id|default:"-" }}</td>
+                            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if item.status == 'PENDING' %}
+                                <span class="badge bg-secondary">En attente</span>
+                                {% elif item.status == 'PROCESSING' %}
+                                <span class="badge bg-info">En cours</span>
+                                {% elif item.status == 'COMPLETED' %}
+                                <span class="badge bg-success">Terminé</span>
+                                {% elif item.status == 'FAILED' %}
+                                <span class="badge bg-danger">
+                                    Échec 
+                                    {% if item.retry_count > 0 %}({{ item.retry_count }} essais){% endif %}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="showDetails('{{ item.id }}')">
+                                    Détails
+                                </button>
+                                
+                                {% if item.status == 'FAILED' %}
+                                <button class="btn btn-sm btn-outline-primary" onclick="retryOperation('{{ item.id }}')">
+                                    Réessayer
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr id="details-{{ item.id }}" class="d-none">
+                            <td colspan="6">
+                                <div class="p-3">
+                                    <h6>Données de l'opération:</h6>
+                                    <div class="data-preview">{{ item.data|safe }}</div>
+                                    
+                                    {% if item.error_message %}
+                                    <h6 class="mt-3">Message d'erreur:</h6>
+                                    <div class="alert alert-danger">{{ item.error_message }}</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <i class="fas fa-check-circle text-success fa-2x mb-3"></i>
+                                <p>Aucune opération hors ligne en attente.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDetails(itemId) {
+        const detailsRow = document.getElementById(`details-${itemId}`);
+        if (detailsRow) {
+            detailsRow.classList.toggle('d-none');
+        }
+    }
+    
+    function filterItems(status) {
+        // Reset all buttons
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Set active button
+        event.target.classList.add('active');
+        
+        // Show/hide rows based on status
+        const rows = document.querySelectorAll('.item-row');
+        rows.forEach(row => {
+            if (status === 'all') {
+                row.style.display = '';
+            } else {
+                if (row.classList.contains(`status-${status}`)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
+    
+    function synchronizeNow() {
+        fetch('/api/synchronize-offline-data/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Synchronisation terminée: ${data.message}`);
+                location.reload();
+            } else {
+                alert(`Erreur de synchronisation: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur de synchronisation:', error);
+            alert('Une erreur est survenue lors de la synchronisation. Veuillez réessayer.');
+        });
+    }
+    
+    function retryOperation(itemId) {
+        // Cette fonction serait implémentée avec un endpoint API approprié
+        alert(`Fonctionnalité à implémenter: réessayer l'opération ${itemId}`);
+    }
+    
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+</script>
+{% endblock %} 

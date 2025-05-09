@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin de Notes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #1e3c72;
+            padding-bottom: 20px;
+        }
+        .logo {
+            max-width: 100px;
+            margin-bottom: 10px;
+        }
+        .university-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .faculty-name {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .document-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0 5px;
+            color: #1e3c72;
+        }
+        .document-subtitle {
+            font-size: 16px;
+            margin: 5px 0 15px;
+        }
+        .student-info {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .info-block {
+            border-left: 3px solid #1e3c72;
+            padding-left: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .grade-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .summary-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #ddd;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+        }
+        .decision-box {
+            text-align: center;
+            margin: 30px 0;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .decision-title {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .decision-value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .decision-admitted {
+            color: #28a745;
+        }
+        .decision-remedial {
+            color: #ffc107;
+        }
+        .decision-failed {
+            color: #dc3545;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-block {
+            width: 45%;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+        .stamp-area {
+            width: 150px;
+            height: 150px;
+            border: 1px dashed #ccc;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #999;
+        }
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <p class="university-name">UNIVERSITÉ</p>
+        <p class="faculty-name">{{ student.promotion.department.faculty.name }}</p>
+        <h1 class="document-title">BULLETIN DE NOTES</h1>
+        <p class="document-subtitle">
+            {{ deliberation.academic_year }} - 
+            Semestre {{ deliberation.semester }} - 
+            {{ student.promotion.get_level_display }}
+        </p>
+    </div>
+
+    <div class="student-info">
+        <div class="info-block">
+            <div class="info-label">Matricule</div>
+            <div class="info-value">{{ student.matricule }}</div>
+        </div>
+        <div class="info-block">
+            <div class="info-label">Nom et Prénom</div>
+            <div class="info-value">{{ student.user.get_full_name }}</div>
+        </div>
+        <div class="info-block">
+            <div class="info-label">Promotion</div>
+            <div class="info-value">{{ student.promotion.get_level_display }}</div>
+        </div>
+        <div class="info-block">
+            <div class="info-label">Département</div>
+            <div class="info-value">{{ student.promotion.department.name }}</div>
+        </div>
+    </div>
+
+    <h2>Unités d'Enseignement</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Intitulé</th>
+                <th>Crédits</th>
+                <th>Évaluation</th>
+                <th>Moyenne</th>
+                <th>Résultat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.ue.code }}</td>
+                <td>{{ grade.ue.title }}</td>
+                <td>{{ grade.ue.credits }}</td>
+                <td>
+                    {% for component in components %}
+                        {% if component.course.ue == grade.ue %}
+                            {% if component.type == 'TP' %}TP: {{ component.score }}/5{% endif %}
+                            {% if component.type == 'CC' %}CC: {{ component.score }}/5{% endif %}
+                            {% if component.type == 'EX' %}Examen: {{ component.score }}/10{% endif %}
+                            <br>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if grade.cc is not None and grade.mc is not None %}
+                        {% with average=grade.cc|add:grade.mc %}
+                            {{ average|floatformat:2 }}/20
+                        {% endwith %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if grade.cc is not None and grade.mc is not None %}
+                        {% with average=grade.cc|add:grade.mc %}
+                            {% if average >= 10 %}
+                            <span class="grade-badge badge-success">Validé</span>
+                            {% else %}
+                            <span class="grade-badge badge-danger">Non validé</span>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary-box">
+        <div class="summary-row">
+            <span>Crédits obtenus:</span>
+            <span>{{ student_deliberation.credits_obtained }}</span>
+        </div>
+        <div class="summary-row">
+            <span>Crédits totaux:</span>
+            <span>{{ deliberation.promotion.department.ue_set.all|length }}</span>
+        </div>
+        <div class="summary-row">
+            <span>Moyenne générale:</span>
+            <span>{{ student_deliberation.average|floatformat:2 }}/20</span>
+        </div>
+    </div>
+
+    <div class="decision-box">
+        <div class="decision-title">Décision du jury</div>
+        <div class="decision-value 
+            {% if student_deliberation.final_decision == 'ADMITTED' %}decision-admitted{% endif %}
+            {% if student_deliberation.final_decision == 'REMEDIAL' %}decision-remedial{% endif %}
+            {% if student_deliberation.final_decision == 'FAILED' %}decision-failed{% endif %}
+        ">
+            {% if student_deliberation.final_decision == 'ADMITTED' %}
+                ADMIS
+            {% elif student_deliberation.final_decision == 'REMEDIAL' %}
+                RATTRAPAGE
+            {% else %}
+                AJOURNÉ
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-block">
+            <div class="signature-line"></div>
+            <p>Le Chef de Département</p>
+        </div>
+        <div class="signature-block">
+            <div class="signature-line"></div>
+            <p>Le Doyen de la Faculté</p>
+        </div>
+    </div>
+
+    <div class="stamp-area">
+        Cachet
+    </div>
+
+    <div class="footer">
+        <p>Document généré le {{ date|date:"d/m/Y à H:i" }}</p>
+        <p>Ce bulletin est personnel et confidentiel.</p>
+    </div>
+</body>
+</html> 

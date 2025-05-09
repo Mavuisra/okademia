@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'belletin/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:new-academic-year' %}">{% trans 'New Academic Year Management' %}</a>
+    &rsaquo; {% trans 'Promote Students' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Promotion des Étudiants - Année {{ academic_year.name }}</h1>
+
+    <div class="info-box">
+        <p><strong>Information:</strong> Cette page vous permet de promouvoir les étudiants au niveau supérieur en fonction des critères LMD.</p>
+        <p>La promotion se base sur l'année académique précédente : <strong>{{ previous_year.name }}</strong>.</p>
+    </div>
+
+    <div class="criteria-box">
+        <h3>Critères LMD de promotion</h3>
+        <ul class="criteria-list">
+            <li><strong>Admission :</strong> 45 crédits ou plus</li>
+            <li><strong>Rattrapage :</strong> Entre 40 et 44 crédits ET moyenne ≥ 8/20</li>
+            <li><strong>Redoublement :</strong> Moins de 40 crédits OU moyenne < 8/20</li>
+        </ul>
+    </div>
+
+    <div class="stats-card">
+        <h2>Statistiques des promotions</h2>
+        <p><strong>Nombre total d'étudiants :</strong> {{ total_students }}</p>
+        
+        {% for level_key, level_data in levels_stats.items %}
+        <div class="level-card">
+            <h3>{{ level_key }}</h3>
+            <p><strong>Département :</strong> {{ level_data.department }}</p>
+            <p><strong>Nombre d'étudiants :</strong> {{ level_data.total }}</p>
+            <p><strong>Niveau supérieur :</strong> {{ level_data.next_level }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="warning-box">
+        <p><strong>Attention :</strong> Cette action va appliquer les règles LMD à tous les étudiants. Assurez-vous que toutes les délibérations ont été complétées.</p>
+        <p>Les étudiants seront promus ou maintenus selon leurs résultats académiques.</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="process_promotions">
+        <button type="submit" class="btn-primary">Lancer le processus de promotion</button>
+    </form>
+
+</div>
+{% endblock %} 

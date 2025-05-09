@@ -1,0 +1,924 @@
+{% extends 'belletin/base.html' %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #0ef0a5;
+        --accent-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --stat-blue: #2196F3;
+        --stat-green: #4CAF50;
+        --stat-orange: #FF9800;
+        --stat-red: #F44336;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+    .container {
+        max-width: 1600px; /* Increased from 1400px */
+        margin: 0 auto;
+        padding: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .welcome-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    /* Layout principal */
+    .dashboard-container {
+        display: flex;
+        gap: 30px;
+        position: relative;
+        width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        flex: 0 0 260px; /* Fixed width, slightly reduced */
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px); /* Ensure it doesn't go beyond viewport */
+        overflow-y: auto; /* Add scrolling for tall sidebars */
+        align-self: flex-start; /* Align to the top */
+    }
+
+    .sidebar-profile {
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .profile-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid white;
+        margin-bottom: 15px;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-menu {
+        padding: 15px 0;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover {
+        background-color: #f5f7fa;
+        color: var(--primary-color);
+        border-left-color: var(--secondary-color);
+    }
+
+    .menu-item.active {
+        background-color: #f0f7ff;
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .menu-item i, 
+    .menu-item span:first-child {
+        margin-right: 12px;
+        font-size: 1.1rem;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    /* Contenu principal */
+    .dashboard-content {
+        flex: 1;
+        min-width: 0; /* Empêche le débordement des enfants flexibles */
+        max-width: calc(100% - 290px); /* Ensure content doesn't overflow container */
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+    .stat-blue::before {
+        background-color: var(--stat-blue);
+    }
+
+    .stat-green::before {
+        background-color: var(--stat-green);
+    }
+
+    .stat-orange::before {
+        background-color: var(--stat-orange);
+    }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 10px;
+    }
+
+    .stat-blue .stat-value {
+        color: var(--stat-blue);
+    }
+
+    .stat-green .stat-value {
+        color: var(--stat-green);
+    }
+
+    .stat-orange .stat-value {
+        color: var(--stat-orange);
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Cartes de contenu */
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 30px;
+        border: none;
+        overflow: hidden;
+        width: 100%; /* Ensure cards take full width of container */
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Disposition en deux colonnes */
+    .dashboard-main {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    /* Notifications */
+    .notification {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .notification:last-child {
+        margin-bottom: 0;
+    }
+
+    .notification.warning {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+    }
+
+    .notification.danger {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+
+    .notification.success {
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+    }
+
+    .notification-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .notification-message {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Tableaux */
+    .table-responsive {
+        overflow-x: auto;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* Fixed layout for better control */
+    }
+
+    .responsive-table th,
+    .responsive-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .responsive-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .responsive-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Barres de progression */
+    .progress-bar {
+        height: 8px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        border-radius: 10px;
+    }
+
+    .progress-text {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    /* Boutons */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-sm {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+    }
+
+    /* Graphiques */
+    .chart-container {
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+        padding: 15px;
+    }
+
+    /* Bouton pour ouvrir la sidebar en mobile */
+    .mobile-sidebar-toggle {
+        display: none;
+        background: white;
+        border: none;
+        padding: 10px;
+        border-radius: 50%;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-sidebar-toggle:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Overlay de la sidebar */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    }
+    
+    .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Media Queries - Optimized ordering */
+    @media (min-width: 1201px) {
+        /* Extra Large screens */
+        .container {
+            padding: 25px;
+        }
+        
+        .dashboard-container {
+            gap: 30px;
+        }
+        
+        .sidebar {
+            flex: 0 0 280px;
+        }
+    }
+    
+    @media (max-width: 1200px) and (min-width: 993px) {
+        /* Large screens */
+        .container {
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            gap: 25px;
+        }
+        
+        .sidebar {
+            flex: 0 0 240px;
+        }
+        
+        .dashboard-content {
+            max-width: calc(100% - 265px);
+        }
+        
+        .dashboard-main {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    
+    @media (max-width: 992px) and (min-width: 769px) {
+        /* Medium screens */
+        .container {
+            padding: 15px;
+        }
+        
+        .dashboard-container {
+            gap: 20px;
+        }
+        
+        .sidebar {
+            flex: 0 0 220px;
+        }
+        
+        .dashboard-content {
+            max-width: calc(100% - 240px);
+        }
+        
+        .dashboard-main {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+        }
+        
+        .card-header, .card-body {
+            padding: 15px;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .menu-item {
+            padding: 10px 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        /* Small screens */
+        .container {
+            padding: 10px;
+        }
+        
+        .dashboard-container {
+            flex-direction: column;
+        }
+        
+        .dashboard-content {
+            max-width: 100%;
+        }
+        
+        .sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 80%;
+            max-width: 300px;
+            z-index: 1000;
+            border-radius: 0;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.active {
+            display: block;
+            transform: translateX(0);
+        }
+
+        .mobile-sidebar-toggle {
+            display: flex;
+        }
+        
+        .sidebar-backdrop.active {
+            display: block;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .stat-value {
+            font-size: 1.6rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        /* Extra small screens */
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .notification {
+            padding: 12px;
+            gap: 10px;
+        }
+        
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+        
+        .menu-item {
+            border-left: none;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .menu-item i, 
+        .menu-item span:first-child {
+            margin-right: 8px;
+        }
+        
+        .menu-item.active {
+            background-color: #e6f2ff;
+            border-left: none;
+            border-bottom: 3px solid var(--primary-color);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Tableau de Bord Professeur</h1>
+            <p class="welcome-message">Bienvenue, {{ professor.user.get_full_name }}</p>
+        </div>
+        <div>
+            <span>{{ current_date }}</span>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-profile">
+                <img src="https://ui-avatars.com/api/?name={{ professor.user.get_full_name|urlencode }}&background=random" alt="Photo de profil" class="profile-image">
+                <h3>{{ professor.user.get_full_name }}</h3>
+                <p>{{ professor.department.name }}</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="{% url 'belletin:professor_dashboard' %}" class="menu-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Tableau de Bord</span>
+                </a>
+                <a href="{% url 'belletin:professor_grades' %}" class="menu-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Mes UEs</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-edit"></i>
+                    <span>Saisie Rapide</span>
+                </a>
+                <a href="{% url 'belletin:notifications' %}" class="menu-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Overlay qui apparaît derrière la sidebar en mode mobile -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+        
+        <!-- Bouton pour ouvrir la sidebar en mobile -->
+        <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="dashboard-content">
+            <div class="stats-grid">
+                <div class="stat-card stat-blue">
+                    <div class="stat-value">{{ stats.ue_count }}</div>
+                    <div class="stat-label">UEs Enseignées</div>
+                </div>
+                <div class="stat-card stat-green">
+                    <div class="stat-value">{{ stats.total_students }}</div>
+                    <div class="stat-label">Étudiants</div>
+                </div>
+                <div class="stat-card stat-orange">
+                    <div class="stat-value">{{ stats.pending_grades }}</div>
+                    <div class="stat-label">Notes en Attente</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-main">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Performance des Étudiants</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="gradesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Actions Requises</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if stats.pending_grades > 0 %}
+                        <div class="notification warning">
+                            <div class="notification-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <strong class="notification-title">Notes en attente</strong>
+                                <p class="notification-message">Vous avez {{ stats.pending_grades }} notes à saisir pour vos UEs.</p>
+                                <a href="{% url 'belletin:professor_grades' %}" class="btn btn-sm btn-primary">Voir mes UEs</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if stats.upcoming_deadlines %}
+                        <div class="notification danger">
+                            <div class="notification-icon">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <div class="notification-content">
+                                <strong class="notification-title">Échéances proches</strong>
+                                <p class="notification-message">Date limite pour la saisie des notes : {{ stats.upcoming_deadlines }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if not stats.pending_grades and not stats.upcoming_deadlines %}
+                        <div class="notification success">
+                            <div class="notification-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <strong class="notification-title">Tout est à jour</strong>
+                                <p class="notification-message">Vous n'avez aucune action en attente pour le moment.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Mes UEs</h2>
+                    <a href="{% url 'belletin:professor_grades' %}" class="btn btn-sm btn-primary">Voir tout</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>UE</th>
+                                    <th>Département</th>
+                                    <th>Niveau</th>
+                                    <th>Progression</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if teaching_units %}
+                                    {% for ue in teaching_units %}
+                                    <tr>
+                                        <td data-label="UE">{{ ue.name }}</td>
+                                        <td data-label="Département">{{ ue.department.name }}</td>
+                                        <td data-label="Niveau">{{ ue.level_display }}</td>
+                                        <td data-label="Progression">
+                                            <div class="progress-bar">
+                                                <div class="progress" style="width: {{ ue.completion_rate }}%"></div>
+                                            </div>
+                                            <div class="progress-text">{{ ue.completion_rate }}%</div>
+                                        </td>
+                                        <td data-label="Actions">
+                                            <a href="{% url 'belletin:quick_grade' ue.course_id %}" class="btn btn-sm btn-primary">Gérer</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">Aucune UE trouvée pour ce professeur</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Charts
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart for Grade Distribution
+        const gradesCtx = document.getElementById('gradesChart').getContext('2d');
+        
+        // Grade Distribution Data (example data - replace with actual data)
+        const gradesData = {
+            labels: ['Excellent (≥16)', 'Très Bien (14-15)', 'Bien (12-13)', 'Assez Bien (11)', 'Passable (10)', 'Échec (<10)'],
+            datasets: [{
+                label: 'Distribution des Notes',
+                data: {{ grade_distribution|safe }},
+                backgroundColor: [
+                    'rgba(0, 200, 83, 0.7)',
+                    'rgba(76, 175, 80, 0.7)',
+                    'rgba(33, 150, 243, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(255, 152, 0, 0.7)',
+                    'rgba(244, 67, 54, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(0, 200, 83, 1)',
+                    'rgba(76, 175, 80, 1)',
+                    'rgba(33, 150, 243, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(255, 152, 0, 1)',
+                    'rgba(244, 67, 54, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const gradesChart = new Chart(gradesCtx, {
+            type: 'pie',
+            data: gradesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Responsive design adjustments
+        function handleResponsiveLayout() {
+            if (window.innerWidth <= 576) {
+                gradesChart.options.plugins.legend.position = 'bottom';
+                gradesChart.update();
+            } else {
+                gradesChart.options.plugins.legend.position = 'right';
+                gradesChart.update();
+            }
+        }
+
+        // Initial call and event listener
+        handleResponsiveLayout();
+        window.addEventListener('resize', handleResponsiveLayout);
+        
+        // Gestion de la sidebar mobile
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
+        const body = document.body;
+        
+        // Fonction pour ouvrir la sidebar
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebarBackdrop.classList.add('active');
+            body.style.overflow = 'hidden';
+            
+            // Ajoute un délai pour permettre l'animation CSS
+            setTimeout(() => {
+                sidebarBackdrop.style.opacity = '1';
+            }, 10);
+        }
+        
+        // Fonction pour fermer la sidebar
+        function closeSidebar() {
+            sidebarBackdrop.style.opacity = '0';
+            
+            // Attendez que l'animation de fondu se termine avant de masquer complètement
+            setTimeout(() => {
+                sidebar.classList.remove('active');
+                sidebarBackdrop.classList.remove('active');
+                body.style.overflow = '';
+            }, 300);
+        }
+        
+        // Fonction pour basculer la sidebar
+        function toggleSidebar() {
+            if (sidebar.classList.contains('active')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        }
+        
+        // Événements pour ouvrir/fermer la sidebar
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        // Fermer la sidebar au clic sur le backdrop
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', closeSidebar);
+        }
+        
+        // Fermer la sidebar au clic sur un lien du menu
+        const menuItems = document.querySelectorAll('.sidebar .menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+        
+        // Fermer la sidebar au redimensionnement de la fenêtre si on passe en desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+        
+        // Fermer la sidebar avec la touche Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+    });
+</script>
+{% endblock %} 

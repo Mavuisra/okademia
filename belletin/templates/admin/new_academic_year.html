@@ -1,0 +1,89 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'belletin/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; {% trans 'New Academic Year Management' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Gestion de Nouvelle Année Académique</h1>
+
+    <div class="info-box">
+        <p><strong>Information:</strong> Cette page vous permet de créer une nouvelle année académique et de gérer la promotion des étudiants selon les critères LMD.</p>
+    </div>
+
+    {% if current_year %}
+    <div class="year-card">
+        <h2>Année académique actuelle</h2>
+        <p><strong>Nom:</strong> {{ current_year.name }}</p>
+        <p><strong>Période:</strong> Du {{ current_year.start_date|date:"d/m/Y" }} au {{ current_year.end_date|date:"d/m/Y" }}</p>
+    </div>
+    {% endif %}
+
+    <div class="form-section">
+        <h2>Créer une nouvelle année académique</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_year">
+            
+            <div class="form-row">
+                <label for="year_name">Nom de l'année académique:</label>
+                <input type="text" id="year_name" name="year_name" placeholder="Ex: 2024-2025" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="start_date">Date de début:</label>
+                <input type="date" id="start_date" name="start_date" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="end_date">Date de fin:</label>
+                <input type="date" id="end_date" name="end_date" required>
+            </div>
+            
+            <div class="form-row">
+                <button type="submit" class="btn-primary">Créer l'année académique</button>
+            </div>
+        </form>
+    </div>
+
+    {% if current_year %}
+    <div class="form-section">
+        <h2>Gestion des promotions d'étudiants</h2>
+        <div class="warning-box">
+            <p><strong>Attention:</strong> Assurez-vous que toutes les délibérations sont complétées avant de procéder à la promotion des étudiants.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="promote_students">
+            <p>Vous êtes sur le point de promouvoir les étudiants pour l'année académique {{ current_year.name }}.</p>
+            <p>Ce processus va appliquer les règles LMD pour déterminer quels étudiants peuvent passer au niveau supérieur.</p>
+            <div class="form-row">
+                <button type="submit" class="btn-primary">Procéder à la promotion des étudiants</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if previous_years %}
+    <div class="year-card">
+        <h2>Années académiques précédentes</h2>
+        <ul>
+            {% for year in previous_years %}
+            <li>{{ year.name }} ({{ year.start_date|date:"d/m/Y" }} - {{ year.end_date|date:"d/m/Y" }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

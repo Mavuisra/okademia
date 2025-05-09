@@ -1,0 +1,629 @@
+{% extends "belletin/base.html" %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --success-color: #4CAF50;
+        --warning-color: #FF9800;
+        --danger-color: #F44336;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1rem 0;
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb-item {
+        margin-right: 0.5rem;
+    }
+
+    .breadcrumb-item::after {
+        content: "/";
+        margin-left: 0.5rem;
+        color: #aaa;
+    }
+
+    .breadcrumb-item:last-child::after {
+        content: "";
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .student-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        border-left: 3px solid var(--primary-color);
+        padding-left: 1rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1.5rem;
+    }
+
+    .table th {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 2px solid #eee;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-hover tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .grade-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .pill-success {
+        background-color: #c8e6c9;
+        color: #388e3c;
+    }
+
+    .pill-warning {
+        background-color: #fff3e0;
+        color: #f57c00;
+    }
+
+    .pill-danger {
+        background-color: #ffcdd2;
+        color: #d32f2f;
+    }
+
+    .summary-box {
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed #ddd;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        font-weight: 500;
+    }
+
+    .summary-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .summary-value.success {
+        color: var(--success-color);
+    }
+
+    .summary-value.warning {
+        color: var(--warning-color);
+    }
+
+    .summary-value.danger {
+        color: var(--danger-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .btn-outline:hover {
+        background: rgba(30, 60, 114, 0.1);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #43a047, #2e7d32);
+        color: white;
+    }
+
+    .btn-success:hover {
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .decision-btns {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .decision-btns .btn {
+        flex: 1;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .history-item {
+        padding: 1rem;
+        border-left: 3px solid #ccc;
+        margin-bottom: 1rem;
+        background-color: #f9f9f9;
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: #666;
+    }
+
+    .history-content {
+        margin-top: 0.5rem;
+    }
+
+    .arrow-change {
+        color: #666;
+        margin: 0 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .student-info {
+            grid-template-columns: 1fr;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .decision-btns {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'belletin:jury_dashboard' %}">Tableau de bord</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'belletin:jury_deliberations_list' %}">Délibérations</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'belletin:jury_deliberation_detail' deliberation_token=deliberation.token %}">{{ deliberation.promotion }}</a></li>
+                <li class="breadcrumb-item">{{ student.user.get_full_name }}</li>
+            </ul>
+            <h2 class="page-title">Détails de l'étudiant</h2>
+        </div>
+        <div>
+            <a href="{% url 'belletin:jury_deliberation_detail' deliberation_token=deliberation.token %}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Informations sur l'étudiant -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Information étudiant</h3>
+        </div>
+        <div class="card-body">
+            <div class="student-info">
+                <div class="info-item">
+                    <div class="info-label">Matricule</div>
+                    <div class="info-value">{{ student.matricule }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nom complet</div>
+                    <div class="info-value">{{ student.user.get_full_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Promotion</div>
+                    <div class="info-value">{{ student.promotion.get_level_display }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Département</div>
+                    <div class="info-value">{{ student.promotion.department.name }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé des notes -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Résultats du semestre</h3>
+        </div>
+        <div class="card-body">
+            <div class="summary-box">
+                <div class="summary-row">
+                    <div class="summary-label">Moyenne générale</div>
+                    <div class="summary-value {% if student_deliberation.average >= 10 %}success{% elif student_deliberation.average >= 8 %}warning{% else %}danger{% endif %}">
+                        {{ student_deliberation.average|floatformat:2 }}/20
+                    </div>
+                </div>
+                <div class="summary-row">
+                    <div class="summary-label">Crédits obtenus</div>
+                    <div class="summary-value">{{ student_deliberation.credits_obtained }}</div>
+                </div>
+                <div class="summary-row">
+                    <div class="summary-label">Décision automatique</div>
+                    <div class="summary-value">
+                        {% if student_deliberation.auto_decision == 'ADMITTED' %}
+                        <span class="grade-pill pill-success">Admis</span>
+                        {% elif student_deliberation.auto_decision == 'REMEDIAL' %}
+                        <span class="grade-pill pill-warning">Rattrapage</span>
+                        {% else %}
+                        <span class="grade-pill pill-danger">Ajourné</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if student_deliberation.final_decision %}
+                <div class="summary-row">
+                    <div class="summary-label">Décision finale</div>
+                    <div class="summary-value">
+                        {% if student_deliberation.final_decision == 'ADMITTED' %}
+                        <span class="grade-pill pill-success">Admis</span>
+                        {% elif student_deliberation.final_decision == 'REMEDIAL' %}
+                        <span class="grade-pill pill-warning">Rattrapage</span>
+                        {% else %}
+                        <span class="grade-pill pill-danger">Ajourné</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="summary-row">
+                    <div class="summary-label">Statut</div>
+                    <div class="summary-value">
+                        {% if student_deliberation.validated %}
+                        <span class="grade-pill pill-success">Validé par {{ student_deliberation.validated_by.get_full_name }}</span>
+                        {% else %}
+                        <span class="grade-pill pill-warning">En attente de validation</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des notes -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>UE</th>
+                            <th>Crédits</th>
+                            <th>Composantes</th>
+                            <th>Moyenne</th>
+                            <th>Résultat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                        <tr>
+                            <td>
+                                <strong>{{ grade.ue.code }}</strong><br>
+                                {{ grade.ue.title }}
+                            </td>
+                            <td>{{ grade.ue.credits }}</td>
+                            <td>
+                                {% for component in components %}
+                                    {% if component.course.ue.id == grade.ue.id %}
+                                        {% if component.type == 'TP' %}
+                                        TP: {{ component.score }}<br>
+                                        {% elif component.type == 'CC' %}
+                                        CC: {{ component.score }}<br>
+                                        {% elif component.type == 'EX' %}
+                                        Examen: {{ component.score }}<br>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if grade.cc is not None and grade.mc is not None %}
+                                    {{ grade.cc|add:grade.mc|floatformat:2 }}/20
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if grade.cc is not None and grade.mc is not None %}
+                                    {% with average=grade.cc|add:grade.mc|floatformat:2 %}
+                                        {% if average >= 10 %}
+                                        <span class="grade-pill pill-success">Validé</span>
+                                        {% else %}
+                                        <span class="grade-pill pill-danger">Non validé</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire de décision -->
+    {% if deliberation.status != 'COMPLETED' %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Décision du jury</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="decision-btns">
+                    <button type="button" class="btn btn-success" onclick="selectDecision('ADMITTED')">
+                        <i class="fas fa-check-circle"></i> Admettre
+                    </button>
+                    <button type="button" class="btn btn-outline" style="border-color: #ff9800; color: #ff9800;" onclick="selectDecision('REMEDIAL')">
+                        <i class="fas fa-redo"></i> Rattrapage
+                    </button>
+                    <button type="button" class="btn btn-outline" style="border-color: #f44336; color: #f44336;" onclick="selectDecision('FAILED')">
+                        <i class="fas fa-times-circle"></i> Ajourner
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.final_decision.id_for_label }}">Décision finale</label>
+                    {{ form.final_decision }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.comments.id_for_label }}">Commentaires / Justification</label>
+                    {{ form.comments }}
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{% url 'belletin:jury_deliberation_detail' deliberation_token=deliberation.token %}" class="btn btn-outline">Annuler</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer la décision
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Historique des modifications -->
+    {% if change_logs %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Historique des modifications</h3>
+        </div>
+        <div class="card-body">
+            {% for log in change_logs %}
+            <div class="history-item">
+                <div class="history-header">
+                    <span>
+                        <strong>{{ log.changed_by.get_full_name }}</strong> a modifié la décision
+                    </span>
+                    <span>{{ log.changed_at|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div>
+                    {% if log.previous_decision == 'ADMITTED' %}
+                    <span class="grade-pill pill-success">Admis</span>
+                    {% elif log.previous_decision == 'REMEDIAL' %}
+                    <span class="grade-pill pill-warning">Rattrapage</span>
+                    {% else %}
+                    <span class="grade-pill pill-danger">Ajourné</span>
+                    {% endif %}
+                    
+                    <span class="arrow-change"><i class="fas fa-long-arrow-alt-right"></i></span>
+                    
+                    {% if log.new_decision == 'ADMITTED' %}
+                    <span class="grade-pill pill-success">Admis</span>
+                    {% elif log.new_decision == 'REMEDIAL' %}
+                    <span class="grade-pill pill-warning">Rattrapage</span>
+                    {% else %}
+                    <span class="grade-pill pill-danger">Ajourné</span>
+                    {% endif %}
+                </div>
+                <div class="history-content">
+                    <em>"{{ log.reason }}"</em>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function selectDecision(decision) {
+        const selectElement = document.getElementById('{{ form.final_decision.id_for_label }}');
+        selectElement.value = decision;
+        
+        // Mettre en évidence le bouton sélectionné
+        const btns = document.querySelectorAll('.decision-btns .btn');
+        btns.forEach(btn => {
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline');
+            
+            if (
+                (decision === 'ADMITTED' && btn.innerText.includes('Admettre')) ||
+                (decision === 'REMEDIAL' && btn.innerText.includes('Rattrapage')) ||
+                (decision === 'FAILED' && btn.innerText.includes('Ajourner'))
+            ) {
+                btn.classList.remove('btn-outline');
+                btn.classList.add('btn-success');
+            }
+        });
+    }
+    
+    // Initialiser le bouton correspondant à la décision actuelle
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentDecision = '{{ student_deliberation.final_decision|default:student_deliberation.auto_decision }}';
+        if (currentDecision) {
+            selectDecision(currentDecision);
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,158 @@
+{% extends "belletin/base.html" %}
+{% load static %}
+
+{% block title %}Promotion des Étudiants | Système LMD{% endblock %}
+
+{% block extra_head %}
+<style>
+    .stats-card {
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .stats-card.primary {
+        background-color: #e6f7ff;
+        border-left: 4px solid #1890ff;
+    }
+    .stats-card.warning {
+        background-color: #fffbe6;
+        border-left: 4px solid #faad14;
+    }
+    .criteria-box {
+        background-color: #f9f9f9;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .level-card {
+        border: 1px solid #eee;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+    }
+    .level-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .level-icon {
+        font-size: 2rem;
+        color: #1890ff;
+        margin-right: 1rem;
+    }
+    .criteria-list {
+        margin-top: 1rem;
+        padding-left: 1.5rem;
+    }
+    .criteria-list li {
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Promotion des Étudiants</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'belletin:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'belletin:admin_new_academic_year' %}">Années Académiques</a></li>
+        <li class="breadcrumb-item active">Promotion des Étudiants</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    Promotion Automatique selon les Critères LMD
+                </div>
+                <div class="card-body">
+                    {% if not previous_year %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Aucune année académique précédente n'a été trouvée. 
+                        La promotion des étudiants nécessite une année académique précédente pour analyser les résultats.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <strong>Année académique actuelle :</strong> {{ academic_year.name }}
+                        <br>
+                        <strong>Année académique précédente :</strong> {{ previous_year.name }}
+                    </div>
+                    
+                    <div class="stats-card primary mb-4">
+                        <h3>Critères de Promotion</h3>
+                        <p>Le passage en classe supérieure est conditionné par les critères du système LMD:</p>
+                        <div class="criteria-list">
+                            <ul>
+                                <li><strong>Admission directe :</strong> Minimum 45 crédits capitalisés (sur 60)</li>
+                                <li><strong>Rattrapage :</strong> Entre 40 et 44 crédits avec moyenne annuelle ≥ 8/20</li>
+                                <li><strong>Redoublement :</strong> Moins de 40 crédits ou moyenne annuelle < 8/20</li>
+                            </ul>
+                        </div>
+                        <div class="mt-3">
+                            <p class="fw-bold">Cette opération effectuera les actions suivantes :</p>
+                            <ol>
+                                <li>Analyser les résultats de chaque étudiant pour l'année {{ previous_year.name }}</li>
+                                <li>Appliquer les critères du système LMD pour déterminer la promotion</li>
+                                <li>Mettre à jour la promotion des étudiants admis pour l'année {{ academic_year.name }}</li>
+                                <li>Conserver au même niveau les étudiants en rattrapage ou ajourné</li>
+                                <li>Enregistrer l'historique des décisions pour chaque étudiant</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3">Étudiants par Niveau</h4>
+                    
+                    <div class="row">
+                        {% for level, stats in levels_stats.items %}
+                        <div class="col-md-4">
+                            <div class="level-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="level-icon">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">{{ level }}</h5>
+                                        <p class="text-muted mb-0">{{ stats.department }}</p>
+                                        <p class="mb-0"><strong>{{ stats.total }}</strong> étudiants</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <p>Promotion potentielle: <strong>{{ level }} → {{ stats.next_level }}</strong></p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Aucun étudiant trouvé pour l'année académique précédente.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="mb-3"><strong>Total: {{ total_students }} étudiants</strong> à traiter pour la promotion académique</p>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="process_promotions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sync me-2"></i> Exécuter la Promotion Automatique
+                            </button>
+                        </form>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Attention :</strong> Cette opération est définitive et affectera tous les étudiants.
+                            Assurez-vous que toutes les délibérations de l'année {{ previous_year.name }} sont complètes avant de continuer.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

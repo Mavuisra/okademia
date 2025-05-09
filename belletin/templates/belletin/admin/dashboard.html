@@ -1,0 +1,515 @@
+{% extends "belletin/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Administrateur | Système LMD{% endblock %}
+
+{% block extra_head %}
+<style>
+    .admin-container {
+        display: flex;
+        min-height: calc(100vh - 70px);
+    }
+    
+    .sidebar {
+        width: 280px;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 1.5rem 0;
+        border-radius: 0 15px 15px 0;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-header {
+        padding: 0 1.5rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .sidebar-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .sidebar-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+    
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sidebar-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+        gap: 12px;
+    }
+    
+    .sidebar-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left: 4px solid #ff8800;
+    }
+    
+    .sidebar-link.active {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left: 4px solid #ff8800;
+        font-weight: bold;
+    }
+    
+    .sidebar-icon {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+    
+    .sidebar-divider {
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin: 1rem 1.5rem;
+    }
+    
+    .sidebar-category {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.5;
+        margin-top: 1rem;
+    }
+    
+    .content {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-x: hidden;
+    }
+    
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #1e3c72;
+    }
+    
+    .dashboard-subtitle {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .stat-icon.blue {
+        background: rgba(30, 60, 114, 0.1);
+        color: #1e3c72;
+    }
+    
+    .stat-icon.green {
+        background: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .stat-icon.orange {
+        background: rgba(255, 136, 0, 0.1);
+        color: #ff8800;
+    }
+    
+    .stat-icon.purple {
+        background: rgba(156, 39, 176, 0.1);
+        color: #9c27b0;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .action-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .action-card-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+    
+    .action-card-icon.blue {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+    }
+    
+    .action-card-icon.orange {
+        background: linear-gradient(135deg, #ff8800, #ff9f00);
+        color: white;
+    }
+    
+    .action-card-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .action-card-content {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+    
+    .action-card-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.6rem 1.2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        gap: 8px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #ff8800, #ff9f00);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        box-shadow: 0 5px 15px rgba(255, 136, 0, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 992px) {
+        .admin-container {
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            width: 100%;
+            border-radius: 0 0 15px 15px;
+            position: relative;
+            top: 0;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .sidebar-menu {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .sidebar-item {
+            width: 50%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">
+                <i class="fas fa-cogs"></i> Administration
+            </h3>
+            <div class="sidebar-subtitle">Système de Gestion Académique</div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:dashboard' %}" class="sidebar-link {% if request.path == '/belletin/' %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-chart-line"></i></span>
+                    Tableau de Bord
+                </a>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-category">Gestion Académique</div>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:admin_new_academic_year' %}" class="sidebar-link {% if 'new-academic-year' in request.path %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-calendar-alt"></i></span>
+                    Années Académiques
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:faculty_list' %}" class="sidebar-link {% if 'faculty' in request.path %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-university"></i></span>
+                    Facultés
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:department_list' %}" class="sidebar-link {% if 'department' in request.path %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-building"></i></span>
+                    Départements
+                </a>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-category">Utilisateurs</div>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:student_list' %}" class="sidebar-link {% if 'student' in request.path %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-user-graduate"></i></span>
+                    Étudiants
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                    Professeurs
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fas fa-gavel"></i></span>
+                    Jury
+                </a>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-category">Cursus</div>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'belletin:ue_list' %}" class="sidebar-link {% if 'ue' in request.path %}active{% endif %}">
+                    <span class="sidebar-icon"><i class="fas fa-book"></i></span>
+                    Unités d'Enseignement
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fas fa-clipboard-list"></i></span>
+                    Notes
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fas fa-graduation-cap"></i></span>
+                    Délibérations
+                </a>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            
+            <li class="sidebar-item">
+                <a href="{% url 'admin:index' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fas fa-tools"></i></span>
+                    Administration Django
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Tableau de Bord Administrateur</h1>
+            <p class="dashboard-subtitle">Bienvenue dans l'interface d'administration du système de gestion académique.</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ students_count|default:"0" }}</div>
+                    <div class="stat-label">Étudiants</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ faculties_count|default:"0" }}</div>
+                    <div class="stat-label">Facultés</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ departments_count|default:"0" }}</div>
+                    <div class="stat-label">Départements</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ current_year|default:"N/A" }}</div>
+                    <div class="stat-label">Année Académique</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cards-grid">
+            <div class="action-card">
+                <div class="action-card-header">
+                    <div class="action-card-icon blue">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="action-card-title">Promotion LMD</h3>
+                </div>
+                <p class="action-card-content">
+                    Gérer la promotion automatique des étudiants selon les critères du système LMD (minimum 45/60 crédits).
+                </p>
+                <div class="action-card-footer">
+                    <a href="{% url 'belletin:admin_new_academic_year' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-card">
+                <div class="action-card-header">
+                    <div class="action-card-icon orange">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 class="action-card-title">Inscription des Étudiants</h3>
+                </div>
+                <p class="action-card-content">
+                    Ajouter de nouveaux étudiants dans le système et les assigner à leurs promotions respectives.
+                </p>
+                <div class="action-card-footer">
+                    <a href="{% url 'belletin:student_create' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-card">
+                <div class="action-card-header">
+                    <div class="action-card-icon blue">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h3 class="action-card-title">Gestion des Délibérations</h3>
+                </div>
+                <p class="action-card-content">
+                    Suivre et gérer les délibérations des jurys pour déterminer les résultats académiques des étudiants.
+                </p>
+                <div class="action-card-footer">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

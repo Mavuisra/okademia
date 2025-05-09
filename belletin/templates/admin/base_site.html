@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'belletin/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    {{ custom_css|safe }}
+
+    /* Styles additionnels */
+    #header {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .module h2, .module caption, .inline-group h2 {
+        border-radius: 4px 4px 0 0;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    #content-related .module {
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .object-tools a {
+        background: var(--primary);
+        border-radius: 4px;
+    }
+
+    .object-tools a:hover {
+        background: var(--secondary);
+    }
+
+    #changelist-filter h2 {
+        background: var(--primary);
+        border-radius: 4px 4px 0 0;
+    }
+
+    #changelist-filter li.selected a {
+        color: var(--primary);
+    }
+
+    thead th {
+        background: #f8f9fa;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    /* Styles pour les liens d'actions personnalisées */
+    .custom-admin-actions {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #e3e3e3;
+    }
+
+    .custom-admin-actions h2 {
+        color: #1e3c72;
+        font-size: 1.2rem;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .custom-admin-button {
+        display: inline-block;
+        background-color: #0d3fb5;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .custom-admin-button:hover {
+        background-color: #0a2d82;
+        color: white;
+        text-decoration: none;
+    }
+
+    .custom-admin-button i {
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block welcome-msg %}
+    {{ block.super }}
+    {% if user.is_superuser %}
+    <div class="custom-admin-actions">
+        <h2>Actions administratives</h2>
+        <a href="{% url 'admin:new-academic-year' %}" class="custom-admin-button">
+            <i class="fas fa-calendar-plus"></i> Nouvelle année académique
+        </a>
+    </div>
+    {% endif %}
+{% endblock %} 

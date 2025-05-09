@@ -1,0 +1,178 @@
+{% extends "belletin/base.html" %}
+{% load static %}
+
+{% block title %}Nouvelle Année Académique | Système LMD{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+<style>
+    .stats-card {
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .stats-card h3 {
+        margin-top: 0;
+        font-size: 1.25rem;
+    }
+    .stats-card.primary {
+        background-color: #e6f7ff;
+        border-left: 4px solid #1890ff;
+    }
+    .stats-card.warning {
+        background-color: #fffbe6;
+        border-left: 4px solid #faad14;
+    }
+    .stats-card.success {
+        background-color: #f6ffed;
+        border-left: 4px solid #52c41a;
+    }
+    .stats-card.danger {
+        background-color: #fff2f0;
+        border-left: 4px solid #ff4d4f;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Gestion des Années Académiques</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'belletin:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item active">Nouvelle Année Académique</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-calendar-plus me-1"></i>
+                    Créer une Nouvelle Année Académique
+                </div>
+                <div class="card-body">
+                    {% if current_year %}
+                    <div class="alert alert-info">
+                        <strong>Année académique actuelle :</strong> {{ current_year.name }} 
+                        ({{ current_year.start_date|date:"d/m/Y" }} - {{ current_year.end_date|date:"d/m/Y" }})
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <strong>Attention :</strong> Aucune année académique n'est définie comme courante.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create_year">
+                        
+                        <div class="mb-3">
+                            <label for="year_name" class="form-label">Nom de l'Année Académique</label>
+                            <input type="text" class="form-control" id="year_name" name="year_name" 
+                                   placeholder="Ex: 2023-2024" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Date de début</label>
+                            <input type="text" class="form-control datepicker" id="start_date" name="start_date" 
+                                   placeholder="JJ/MM/AAAA" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Date de fin</label>
+                            <input type="text" class="form-control datepicker" id="end_date" name="end_date" 
+                                   placeholder="JJ/MM/AAAA" required>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Créer une nouvelle année académique active va désactiver l'année académique courante.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Créer l'Année Académique
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user-graduate me-1"></i>
+                    Promotion des Étudiants
+                </div>
+                <div class="card-body">
+                    <div class="stats-card primary">
+                        <h3>Système de Promotion LMD</h3>
+                        <p>Le passage en classe supérieure est conditionné par les critères suivants:</p>
+                        <ul>
+                            <li><strong>Admission directe:</strong> Minimum 45 crédits sur 60</li>
+                            <li><strong>Rattrapage:</strong> Entre 40-44 crédits avec moyenne ≥ 8/20</li>
+                            <li><strong>Redoublement:</strong> Moins de 40 crédits ou moyenne < 8/20</li>
+                        </ul>
+                    </div>
+                    
+                    {% if current_year %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="promote_students">
+                        
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-graduation-cap me-1"></i> Gérer la Promotion des Étudiants
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Vous devez d'abord créer une année académique avant de pouvoir gérer les promotions.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if previous_years %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-history me-1"></i>
+                    Années Académiques Précédentes
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Année</th>
+                                    <th>Période</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for year in previous_years %}
+                                <tr>
+                                    <td>{{ year.name }}</td>
+                                    <td>{{ year.start_date|date:"d/m/Y" }} - {{ year.end_date|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            locale: "fr",
+            allowInput: true
+        });
+    });
+</script>
+{% endblock %} 

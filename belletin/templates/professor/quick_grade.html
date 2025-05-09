@@ -1,0 +1,766 @@
+{% extends "belletin/base.html" %}
+
+{% block title %}Notation rapide - {{ course }}{% endblock %}
+
+{% block extra_head %}
+<!-- Inclure Select2 pour une meilleure interface de sélection -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition-speed: 0.3s;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        transition: transform var(--transition-speed);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #eee;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        transition: all var(--transition-speed);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        outline: none;
+    }
+
+    /* Select2 Customization */
+    .select2-container--default .select2-selection--single {
+        height: 48px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+        color: #333;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px;
+    }
+
+    .select2-dropdown {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Button Styles */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all var(--transition-speed);
+        cursor: pointer;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+    }
+
+    /* Table Styles */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 0;
+    }
+
+    .table th {
+        background: #f8fafc;
+        color: var(--primary-color);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        color: #333;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Grade Display */
+    .grade-cell {
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+        min-width: 3rem;
+        text-align: center;
+    }
+
+    .total-grade {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .table-container {
+            margin: 0 -1rem;
+            border-radius: 0;
+        }
+
+        .table th, .table td {
+            padding: 0.75rem;
+        }
+    }
+
+    /* Select Styles */
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 2.5rem;
+    }
+
+    select.form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        outline: none;
+    }
+
+    /* Input Number Styles */
+    input[type="number"].form-control {
+        -moz-appearance: textfield;
+    }
+
+    input[type="number"].form-control::-webkit-outer-spin-button,
+    input[type="number"].form-control::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Form Feedback */
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23dc3545' viewBox='0 0 16 16'%3E%3Cpath d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        padding: 0.35rem 0.65rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-edit {
+        background-color: #ffa502;
+        color: white;
+    }
+    
+    .btn-edit:hover {
+        background-color: #ff9f43;
+        color: white;
+    }
+    
+    .btn-delete {
+        background-color: #ff6b6b;
+        color: white;
+    }
+    
+    .btn-delete:hover {
+        background-color: #ee5253;
+        color: white;
+    }
+    
+    .btn-view {
+        background-color: #2e86de;
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background-color: #2273c3;
+        color: white;
+    }
+    
+    /* Modal Styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-container {
+        background-color: white;
+        border-radius: 12px;
+        max-width: 400px;
+        width: 100%;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .modal-header {
+        margin-bottom: 1rem;
+    }
+    
+    .modal-title {
+        color: var(--primary-color);
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    
+    .modal-body {
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+    
+    .show-modal {
+        display: flex;
+    }
+
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+    
+    .student-table th, .student-table td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    
+    .student-table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+    }
+    
+    .student-table tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .student-table tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .grade-form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    
+    .form-row > .col {
+        padding-right: 5px;
+        padding-left: 5px;
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+    
+    .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+        color: #fff;
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    
+    .btn-danger {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        cursor: pointer;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+    
+    .note-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .note-value {
+        font-weight: 600;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }
+    
+    .alert-offline {
+        background-color: #ffeeba;
+        border-color: #ffc107;
+        color: #856404;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.25rem;
+        display: none;
+    }
+    
+    body.offline-mode .alert-offline {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Notation rapide - {{ course.ue.code }} - {{ course.ue.title }}</h1>
+    <p>Professeur: {{ course.professor.user.get_full_name }}</p>
+    <p>Promotion: {{ course.ue.promotion }}</p>
+    
+    <!-- Alerte mode hors ligne -->
+    <div class="alert alert-warning alert-offline">
+        <strong><i class="fas fa-exclamation-triangle"></i> Mode hors ligne activé</strong>
+        <p>Vos modifications seront enregistrées localement et synchronisées lorsque vous serez à nouveau connecté à Internet.</p>
+    </div>
+    
+    {% if edit_student_data %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Modifier les notes de {{ edit_student_data.student.user.get_full_name }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" data-offline-support>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="student" value="{{ edit_student_data.student.id }}">
+                
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="tp">TP (sur 5)</label>
+                        <input type="number" class="form-control" id="tp" name="tp" step="0.25" min="0" max="5" value="{{ edit_student_data.grades.TP|default:'0' }}" required>
+                    </div>
+                    <div class="col form-group">
+                        <label for="interrogation">Interrogation (sur 5)</label>
+                        <input type="number" class="form-control" id="interrogation" name="interrogation" step="0.25" min="0" max="5" value="{{ edit_student_data.grades.INTERROGATION|default:'0' }}" required>
+                    </div>
+                    <div class="col form-group">
+                        <label for="examen">Examen (sur 10)</label>
+                        <input type="number" class="form-control" id="examen" name="examen" step="0.25" min="0" max="10" value="{{ edit_student_data.grades.EXAMEN|default:'0' }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                    <a href="{% url 'belletin:quick_grade' course_id=course.id %}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Ajouter de nouvelles notes</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" data-offline-support>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create">
+                
+                <div class="form-group">
+                    <label for="student">Étudiant</label>
+                    <select class="form-control" id="student" name="student" required>
+                        <option value="">-- Sélectionner un étudiant --</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.matricule }} - {{ student.user.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="tp">TP (sur 5)</label>
+                        <input type="number" class="form-control" id="tp" name="tp" step="0.25" min="0" max="5" required>
+                    </div>
+                    <div class="col form-group">
+                        <label for="interrogation">Interrogation (sur 5)</label>
+                        <input type="number" class="form-control" id="interrogation" name="interrogation" step="0.25" min="0" max="5" required>
+                    </div>
+                    <div class="col form-group">
+                        <label for="examen">Examen (sur 10)</label>
+                        <input type="number" class="form-control" id="examen" name="examen" step="0.25" min="0" max="10" required>
+                    </div>
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>Notes existantes</h3>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="student-table">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Nom</th>
+                        <th>TP (5)</th>
+                        <th>Interrogation (5)</th>
+                        <th>Examen (10)</th>
+                        <th>Total (20)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in students_grades %}
+                    <tr>
+                        <td>{{ item.student.matricule }}</td>
+                        <td>{{ item.student.user.get_full_name }}</td>
+                        <td>{{ item.grades.TP|default:"-" }}</td>
+                        <td>{{ item.grades.INTERROGATION|default:"-" }}</td>
+                        <td>{{ item.grades.EXAMEN|default:"-" }}</td>
+                        <td>
+                            {% if item.grades.TP is not None and item.grades.INTERROGATION is not None and item.grades.EXAMEN is not None %}
+                                {{ item.grades.TP|add:item.grades.INTERROGATION|add:item.grades.EXAMEN }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'belletin:quick_grade' course_id=course.id %}?edit={{ item.student.id }}" class="btn btn-sm btn-primary">Modifier</a>
+                            <form method="post" style="display: inline;" data-offline-support>
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="student_id" value="{{ item.student.id }}">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ces notes ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune note enregistrée</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal-backdrop" id="deleteModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 class="modal-title">Confirmer la suppression</h5>
+        </div>
+        <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir supprimer les notes de <strong id="studentName"></strong>?</p>
+            <p>Cette action est irréversible.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="student_id" id="deleteStudentId">
+                <button type="submit" class="btn btn-delete">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Détection du mode hors ligne
+    function updateOfflineStatus() {
+        document.body.classList.toggle('offline-mode', !navigator.onLine);
+        
+        const buttons = document.querySelectorAll('button[type="submit"]');
+        buttons.forEach(button => {
+            if (!navigator.onLine) {
+                button.textContent = button.textContent + ' (Hors ligne)';
+            } else {
+                button.textContent = button.textContent.replace(' (Hors ligne)', '');
+            }
+        });
+    }
+    
+    // Initialiser l'état de connexion
+    document.addEventListener('DOMContentLoaded', function() {
+        updateOfflineStatus();
+        window.addEventListener('online', updateOfflineStatus);
+        window.addEventListener('offline', updateOfflineStatus);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('gradeForm');
+        const studentSelect = document.getElementById('student');
+        const tpInput = document.getElementById('tp');
+        const interrogationInput = document.getElementById('interrogation');
+        const examenInput = document.getElementById('examen');
+        const studentSearch = document.getElementById('studentSearch');
+
+        // Fonction pour valider un champ numérique
+        function validateNumberInput(input, min, max) {
+            const value = parseFloat(input.value);
+            if (isNaN(value) || value < min || value > max) {
+                input.classList.add('is-invalid');
+                return false;
+            }
+            input.classList.remove('is-invalid');
+            return true;
+        }
+
+        // Validation en temps réel des champs
+        if (tpInput) {
+            tpInput.addEventListener('input', () => validateNumberInput(tpInput, 0, 5));
+        }
+        if (interrogationInput) {
+            interrogationInput.addEventListener('input', () => validateNumberInput(interrogationInput, 0, 5));
+        }
+        if (examenInput) {
+            examenInput.addEventListener('input', () => validateNumberInput(examenInput, 0, 10));
+        }
+
+        // Validation du formulaire à la soumission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Valider la sélection de l'étudiant si en mode création
+                if (studentSelect) {
+                    if (!studentSelect.value) {
+                        studentSelect.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        studentSelect.classList.remove('is-invalid');
+                    }
+                }
+
+                // Valider les notes
+                if (tpInput && !validateNumberInput(tpInput, 0, 5)) isValid = false;
+                if (interrogationInput && !validateNumberInput(interrogationInput, 0, 5)) isValid = false;
+                if (examenInput && !validateNumberInput(examenInput, 0, 10)) isValid = false;
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Filtrage des étudiants en temps réel
+        if (studentSearch && studentSelect) {
+            studentSearch.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const options = studentSelect.options;
+
+                for (let i = 1; i < options.length; i++) {
+                    const text = options[i].text.toLowerCase();
+                    options[i].style.display = text.includes(searchTerm) ? '' : 'none';
+                }
+            });
+        }
+    });
+
+    // Fonctions pour la modal de suppression
+    function confirmDelete(studentId, studentName) {
+        document.getElementById('deleteStudentId').value = studentId;
+        document.getElementById('studentName').textContent = studentName;
+        document.getElementById('deleteModal').classList.add('show-modal');
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').classList.remove('show-modal');
+    }
+
+    // Fermer la modal si on clique à l'extérieur
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('deleteModal');
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %} 

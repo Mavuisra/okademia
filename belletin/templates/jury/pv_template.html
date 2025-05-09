@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procès-Verbal de Délibération</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #1e3c72;
+            padding-bottom: 20px;
+        }
+        .logo {
+            max-width: 100px;
+            margin-bottom: 10px;
+        }
+        .university-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .faculty-name {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .document-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0 5px;
+            color: #1e3c72;
+        }
+        .document-subtitle {
+            font-size: 16px;
+            margin: 5px 0 15px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 180px;
+        }
+        .signature-section {
+            margin-top: 40px;
+        }
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .signature-block {
+            width: 30%;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .statistics {
+            margin: 20px 0;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .stamp-area {
+            border: 1px dashed #ccc;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            font-style: italic;
+            color: #999;
+        }
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <p class="university-name">UNIVERSITÉ</p>
+        <p class="faculty-name">{{ deliberation.promotion.department.faculty.name }}</p>
+        <h1 class="document-title">PROCÈS-VERBAL DE DÉLIBÉRATION</h1>
+        <p class="document-subtitle">
+            {{ deliberation.promotion.get_level_display }} - 
+            {{ deliberation.promotion.department.name }} - 
+            Semestre {{ deliberation.semester }}
+        </p>
+    </div>
+
+    <div class="info-section">
+        <div class="info-row">
+            <span class="info-label">Année académique:</span>
+            <span>{{ deliberation.academic_year }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Date de délibération:</span>
+            <span>{{ deliberation.date_completed|date:"d/m/Y" }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Promotion:</span>
+            <span>{{ deliberation.promotion.get_level_display }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Département:</span>
+            <span>{{ deliberation.promotion.department.name }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Faculté:</span>
+            <span>{{ deliberation.promotion.department.faculty.name }}</span>
+        </div>
+    </div>
+
+    <h2>Liste des étudiants</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Matricule</th>
+                <th style="width: 35%;">Nom et prénom</th>
+                <th style="width: 15%;">Moyenne</th>
+                <th style="width: 15%;">Crédits obtenus</th>
+                <th style="width: 20%;">Décision</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sd in student_deliberations %}
+            <tr>
+                <td>{{ sd.student.matricule }}</td>
+                <td>{{ sd.student.user.get_full_name }}</td>
+                <td>{{ sd.average|floatformat:2 }}/20</td>
+                <td>{{ sd.credits_obtained }}</td>
+                <td>
+                    {% if sd.final_decision == 'ADMITTED' %}
+                    Admis
+                    {% elif sd.final_decision == 'REMEDIAL' %}
+                    Rattrapage
+                    {% else %}
+                    Ajourné
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="statistics">
+        <h3>Statistiques</h3>
+        <div class="stat-row">
+            <span>Nombre total d'étudiants:</span>
+            <span><strong>{{ stats.total }}</strong></span>
+        </div>
+        <div class="stat-row">
+            <span>Nombre d'admis:</span>
+            <span><strong>{{ stats.admitted }} ({{ stats.admitted_percent|floatformat:1 }}%)</strong></span>
+        </div>
+        <div class="stat-row">
+            <span>Nombre de rattrapages:</span>
+            <span><strong>{{ stats.remedial }} ({{ stats.remedial_percent|floatformat:1 }}%)</strong></span>
+        </div>
+        <div class="stat-row">
+            <span>Nombre d'ajournés:</span>
+            <span><strong>{{ stats.failed }} ({{ stats.failed_percent|floatformat:1 }}%)</strong></span>
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <h3>Membres du jury présents</h3>
+        <div class="signatures">
+            {% for member in jury_members %}
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <p>{{ member.jury_member.user.get_full_name }}</p>
+                <p>{% if member.jury_member.is_president %}Président{% else %}Membre{% endif %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="stamp-area">
+        Emplacement pour le cachet de l'institution
+    </div>
+
+    <div class="footer">
+        <p>Document généré le {{ date|date:"d/m/Y à H:i" }}</p>
+        <p>Ce document est officiel et contient {{ stats.total }} étudiants.</p>
+    </div>
+</body>
+</html> 

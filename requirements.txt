@@ -1,0 +1,24 @@
+# Requirements for Bulletin Project
+Django==5.0.2
+Pillow==10.1.0  # Pour le traitement d'images
+WeasyPrint==60.1  # Pour la génération de PDF à partir de HTML
+django-crispy-forms==2.1  # Pour des formulaires plus élégants
+django-widget-tweaks==1.5.0  # Pour faciliter la personnalisation des widgets de formulaire
+python-dateutil==2.8.2  # Pour la manipulation des dates
+django-simple-history==3.4.0  # Pour le suivi des modifications
+djangorestframework==3.14.0  # Pour l'API REST (si utilisée)
+django-filter==23.5  # Pour le filtrage des résultats
+django-import-export==3.3.3  # Pour l'importation/exportation de données
+django-cors-headers==4.3.1  # Pour la gestion des CORS
+
+# Dépendances de sécurité
+django-axes==6.1.1  # Pour la sécurité de connexion
+django-csp==3.7  # Pour la politique de sécurité du contenu
+
+# Utilitaires
+python-dotenv==1.0.0  # Pour charger les variables d'environnement
+
+# Dépendances optionnelles pour WeasyPrint (si utilisées dans votre projet)
+# Ces dépendances peuvent nécessiter des installations système supplémentaires
+# pycairo==1.25.1
+# PyGObject==3.46.0 

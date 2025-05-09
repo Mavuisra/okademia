@@ -1,0 +1,1018 @@
+{% extends "belletin/base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #0ef0a5;
+        --primary-dark: #08c084;
+        --primary-light: #6ff5c3;
+        --accent-color: #0ea5f0;
+        --secondary-color: #f72585;
+        --tertiary-color: #9c6eff;
+        --dark-bg: #111927;
+        --light-bg: #f0f4f8;
+        --card-bg: rgba(255, 255, 255, 0.8);
+        --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 10px 30px rgba(14, 240, 165, 0.15);
+        --shadow-lg: 0 20px 40px rgba(14, 240, 165, 0.2);
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.18);
+        --blur-effect: blur(10px);
+    }
+
+    body {
+        background: linear-gradient(135deg, #f0f4f8 0%, #ecf4ff 100%);
+        background-attachment: fixed;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Background elements */
+    .bg-gradient {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(14, 240, 165, 0.15) 0%, transparent 25%),
+            radial-gradient(circle at 80% 60%, rgba(14, 165, 240, 0.15) 0%, transparent 30%),
+            radial-gradient(circle at 40% 80%, rgba(156, 110, 255, 0.15) 0%, transparent 25%);
+        z-index: -1;
+    }
+
+    .bg-element {
+        position: fixed;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.4;
+    }
+
+    .bg-element-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--primary-color);
+        top: -100px;
+        right: 10%;
+        animation: float 8s ease-in-out infinite;
+    }
+
+    .bg-element-2 {
+        width: 250px;
+        height: 250px;
+        background: var(--accent-color);
+        bottom: -50px;
+        left: 5%;
+        animation: float 10s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+
+    .bg-element-3 {
+        width: 200px;
+        height: 200px;
+        background: var(--tertiary-color);
+        top: 40%;
+        left: 25%;
+        animation: float 12s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+        100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1rem;
+        position: relative;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        background: linear-gradient(90deg, var(--dark-bg), #4a6fa6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 0;
+        padding: 10px 0;
+        position: relative;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .page-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        border-radius: 4px;
+    }
+
+    .academic-year-badge {
+        font-size: 1rem;
+        padding: 8px 16px;
+        background: var(--glass-bg);
+        backdrop-filter: var(--blur-effect);
+        -webkit-backdrop-filter: var(--blur-effect);
+        border-radius: 30px;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-sm);
+        color: #667385;
+        animation: slideIn 0.5s ease-out;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--blur-effect);
+        -webkit-backdrop-filter: var(--blur-effect);
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2.5rem;
+        border: 1px solid var(--glass-border);
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    }
+
+    .card-title {
+        color: var(--dark-bg);
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-title i {
+        color: var(--primary-color);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .student-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        position: relative;
+        padding: 1.2rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #667385;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .info-label i {
+        color: var(--accent-color);
+        font-size: 1rem;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--dark-bg);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: var(--dark-bg);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-left: 15px;
+        font-weight: 700;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 5px;
+        background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+        border-radius: 5px;
+    }
+
+    .year-title {
+        font-size: 1.5rem;
+        color: var(--dark-bg);
+        margin: 2rem 0 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .year-title i {
+        color: var(--accent-color);
+    }
+
+    .semester-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--blur-effect);
+        -webkit-backdrop-filter: var(--blur-effect);
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+        border: 1px solid var(--glass-border);
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        animation: fadeIn 1s ease-out;
+        position: relative;
+    }
+
+    .semester-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .semester-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .semester-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--dark-bg);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .semester-title i {
+        color: var(--primary-color);
+    }
+
+    .semester-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-right: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .badge-admitted {
+        background: linear-gradient(135deg, rgba(56, 142, 60, 0.1), rgba(76, 175, 80, 0.3));
+        color: #388e3c;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+
+    .badge-remedial {
+        background: linear-gradient(135deg, rgba(245, 124, 0, 0.1), rgba(255, 167, 38, 0.3));
+        color: #f57c00;
+        border: 1px solid rgba(255, 167, 38, 0.2);
+    }
+
+    .badge-failed {
+        background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.3));
+        color: #d32f2f;
+        border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+
+    .table-container {
+        padding: 1.5rem 2rem;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        background: rgba(255, 255, 255, 0.3);
+        position: relative;
+    }
+
+    .table th:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    .table th:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+        color: #2d3748;
+    }
+
+    .table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table tr:hover td {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .grade-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .grade-passing {
+        background: linear-gradient(135deg, rgba(56, 142, 60, 0.1), rgba(76, 175, 80, 0.3));
+        color: #388e3c;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+
+    .grade-failing {
+        background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(244, 67, 54, 0.3));
+        color: #d32f2f;
+        border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+
+    .summary-box {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 0 2rem 2rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .summary-item span:first-child {
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    .summary-item span:last-child {
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.4s ease;
+    }
+
+    .btn:hover::before {
+        transform: translateX(0);
+    }
+
+    .btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn:hover i {
+        transform: translateX(3px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+        transform: translateY(-3px);
+    }
+
+    .btn-outline {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #334155;
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #a0aec0;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-text {
+        color: #4a5568;
+        font-size: 1.1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Media queries pour le responsive design */
+    @media (max-width: 1200px) {
+        .container {
+            max-width: 100%;
+            padding: 1.5rem;
+        }
+        
+        .results-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .page-title {
+            font-size: 2.2rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .semester-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .student-info {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .info-box {
+            min-width: calc(50% - 1rem);
+            margin-right: 0;
+        }
+        
+        .results-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+        }
+        
+        .card-header {
+            padding: 1.2rem 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+        }
+        
+        .card-body {
+            padding: 1.2rem;
+        }
+        
+        .student-photo {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .semester-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .ue-table {
+            display: block;
+            overflow-x: auto;
+        }
+        
+        .performance-chart-wrapper {
+            height: 250px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .academic-year-badge {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+        }
+        
+        .card-header {
+            padding: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .student-profile {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .student-details {
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+        
+        .info-box {
+            min-width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-stats {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stat-box {
+            width: 100%;
+        }
+        
+        .note-info {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gradient"></div>
+<div class="bg-element bg-element-1"></div>
+<div class="bg-element bg-element-2"></div>
+<div class="bg-element bg-element-3"></div>
+
+<div class="container">
+    <div class="page-header">
+        <h2 class="page-title">Bulletin académique</h2>
+        {% if current_year %}
+        <div class="academic-year-badge">
+            <i class="fas fa-calendar-alt"></i> Année académique en cours: {{ current_year }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user-graduate"></i> Informations Étudiant</h3>
+        </div>
+        <div class="card-body">
+            <div class="student-info">
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-id-card"></i> Matricule</div>
+                    <div class="info-value">{{ student.matricule }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-user"></i> Nom complet</div>
+                    <div class="info-value">{{ student.user.get_full_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-graduation-cap"></i> Promotion</div>
+                    <div class="info-value">{{ student.promotion.get_level_display }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-building"></i> Département</div>
+                    <div class="info-value">{{ student.promotion.department.name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-university"></i> Faculté</div>
+                    <div class="info-value">{{ student.promotion.department.faculty.name }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if deliberations %}
+    <h3 class="section-title">Résultats de délibérations</h3>
+
+    {% regroup deliberations by deliberation.academic_year as year_list %}
+    {% for year_group in year_list %}
+        <h4 class="year-title"><i class="fas fa-calendar-week"></i> Année académique {{ year_group.grouper }}</h4>
+        
+        {% regroup year_group.list by deliberation.semester as semester_list %}
+        {% for semester_group in semester_list %}
+            {% with delib=semester_group.list.0 %}
+            <div class="semester-card">
+                <div class="semester-header">
+                    <div class="semester-title"><i class="fas fa-bookmark"></i> Semestre {{ delib.deliberation.semester }}</div>
+                    <div>
+                        {% if delib.deliberation.status == 'COMPLETED' %}
+                            {% if delib.final_decision == 'ADMITTED' %}
+                            <span class="semester-badge badge-admitted"><i class="fas fa-check-circle"></i> Admis</span>
+                            {% elif delib.final_decision == 'REMEDIAL' %}
+                            <span class="semester-badge badge-remedial"><i class="fas fa-sync"></i> Rattrapage</span>
+                            {% else %}
+                            <span class="semester-badge badge-failed"><i class="fas fa-times-circle"></i> Ajourné</span>
+                            {% endif %}
+                        {% elif delib.deliberation.status == 'IN_PROGRESS' %}
+                            <span class="semester-badge" style="background: linear-gradient(135deg, rgba(0, 121, 107, 0.1), rgba(0, 150, 136, 0.3)); color: #00796b; border: 1px solid rgba(0, 150, 136, 0.2);">
+                                <i class="fas fa-spinner fa-spin"></i> En cours
+                            </span>
+                        {% else %}
+                            <span class="semester-badge" style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.1), rgba(66, 165, 245, 0.3)); color: #1976d2; border: 1px solid rgba(66, 165, 245, 0.2);">
+                                <i class="fas fa-clock"></i> En attente
+                            </span>
+                        {% endif %}
+                        
+                        <!-- Always show deliberation coupon link -->
+                        {% if delib.deliberation.token %}
+                        <a href="{% url 'belletin:student_download_bulletin_coupon' deliberation_token=delib.deliberation.token %}" class="btn btn-outline btn-sm">
+                            <i class="fas fa-file-alt"></i> Relevé complet
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Only show bulletin download for completed deliberations -->
+                        {% if delib.deliberation.status == 'COMPLETED' and delib.deliberation.token %}
+                        <a href="{% url 'belletin:student_download_bulletin' deliberation_token=delib.deliberation.token %}" class="btn btn-outline btn-sm" style="margin-right:8px;">
+                            <i class="fas fa-download"></i> Bulletin officiel
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Unité d'Enseignement</th>
+                                    <th>Crédit</th>
+                                    <th>Notes</th>
+                                    <th>Moyenne</th>
+                                    <th>Résultat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                    {% if grade.ue.semester == delib.deliberation.semester and grade.ue.promotion.academic_year == delib.deliberation.academic_year %}
+                                    <tr>
+                                        <td>{{ grade.ue.code }}</td>
+                                        <td>{{ grade.ue.title }}</td>
+                                        <td>{{ grade.ue.credits }}</td>
+                                        <td>
+                                            {% for component in components %}
+                                                {% if component.course.ue == grade.ue %}
+                                                    {% if component.type == 'TP' %}
+                                                    <span>TP: {{ component.score }}</span>
+                                                    {% elif component.type == 'CC' %}
+                                                    <span>CC: {{ component.score }}</span>
+                                                    {% elif component.type == 'EX' %}
+                                                    <span>EX: {{ component.score }}</span>
+                                                    {% endif %}
+                                                    <br>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% if grade.cc is not None and grade.mc is not None %}
+                                                {% with sum=grade.cc|add:grade.mc %}
+                                                    {{ sum|floatformat:2 }} / 2
+                                                {% endwith %}
+                                            {% else %}
+                                                <span>-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if grade.cc is not None and grade.mc is not None %}
+                                                {% with sum=grade.cc|add:grade.mc %}
+                                                    {% if sum >= 10 %}
+                                                        <span class="grade-pill grade-passing"><i class="fas fa-check-circle"></i> Validé</span>
+                                                    {% else %}
+                                                        <span class="grade-pill grade-failing"><i class="fas fa-times-circle"></i> Non validé</span>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% else %}
+                                                <span>-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="summary-box">
+                    {% if delib.deliberation.status == 'COMPLETED' or delib.credits_obtained > 0 %}
+                    <div class="summary-item">
+                        <span><i class="fas fa-award"></i> Crédits obtenus</span>
+                        <span>{{ delib.credits_obtained }}/30</span>
+                    </div>
+                    <div class="summary-item">
+                        <span><i class="fas fa-calculator"></i> Moyenne générale</span>
+                        <span>{{ delib.average|floatformat:2 }}/20</span>
+                    </div>
+                    {% endif %}
+                    <div class="summary-item">
+                        <span><i class="fas fa-info-circle"></i> Statut de la délibération</span>
+                        <span>
+                            {% if delib.deliberation.status == 'COMPLETED' %}
+                                <strong style="color: #388e3c;"><i class="fas fa-check-circle"></i> Terminée</strong>
+                                {% if delib.final_decision %}
+                                - Décision: 
+                                    {% if delib.final_decision == 'ADMITTED' %}
+                                    <strong style="color: #388e3c;"><i class="fas fa-check-circle"></i> Admis</strong>
+                                    {% elif delib.final_decision == 'REMEDIAL' %}
+                                    <strong style="color: #f57c00;"><i class="fas fa-sync"></i> Rattrapage</strong>
+                                    {% else %}
+                                    <strong style="color: #d32f2f;"><i class="fas fa-times-circle"></i> Ajourné</strong>
+                                    {% endif %}
+                                {% endif %}
+                            {% elif delib.deliberation.status == 'IN_PROGRESS' %}
+                                <strong style="color: #00796b;"><i class="fas fa-spinner fa-spin"></i> En cours de délibération</strong>
+                            {% else %}
+                                <strong style="color: #1976d2;"><i class="fas fa-clock"></i> En attente</strong>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    {% endfor %}
+    
+    {% else %}
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title mb-0"><i class="fas fa-info-circle"></i> Information</h3>
+            </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
+        </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-hourglass-half mr-2"></i> Aucun résultat de délibération n'est actuellement disponible. Les résultats seront affichés ici dès qu'une délibération sera complétée par le jury.
+    </div>
+    {% endif %}
+            
+            <p class="mt-3">Pour toute question concernant vos résultats académiques, veuillez contacter le secrétariat académique ou votre coordinateur pédagogique.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-book"></i> Détails des Notes par UE</h3>
+        </div>
+        <div class="card-body">
+            {% if grades %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Unité d'Enseignement</th>
+                            <th>Semestre</th>
+                            <th>Crédits</th>
+                            <th>CC</th>
+                            <th>MC</th>
+                            <th>Moyenne</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                        <tr>
+                            <td>{{ grade.ue.code }}</td>
+                            <td>{{ grade.ue.title }}</td>
+                            <td>{{ grade.ue.semester }}</td>
+                            <td>{{ grade.ue.credits }}</td>
+                            <td>{{ grade.cc|default:"-" }}</td>
+                            <td>{{ grade.mc|default:"-" }}</td>
+                            <td>
+                                {% if grade.cc is not None and grade.mc is not None %}
+                                    {% with sum=grade.cc|add:grade.mc %}
+                                        {{ sum|floatformat:2 }} / 2
+                                    {% endwith %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if grade.cc is not None and grade.mc is not None %}
+                                    {% with sum=grade.cc|add:grade.mc %}
+                                        {% if sum >= 10 %}
+                                            <span class="badge badge-success">Validé</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Non validé</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <span class="badge badge-warning">En attente</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Aucune note n'est encore disponible pour ce semestre.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animation des éléments au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const elements = document.querySelectorAll('.card, .semester-card, .section-title, .year-title');
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        elements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    });
+</script>
+{% endblock %} 

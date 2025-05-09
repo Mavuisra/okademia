@@ -1,0 +1,389 @@
+{% extends 'belletin/base.html' %}
+
+{% block title %}Gestion des Notifications | Système de Gestion Académique{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="/static/pwa/push-notification-styles.css">
+    <style>
+        /* Styles responsifs pour la page des notifications */
+        .notification-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            padding: 2rem;
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .notification-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(13, 63, 181, 0.1);
+        }
+        
+        .notification-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin: 0;
+        }
+        
+        .notification-description {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .notification-settings {
+            margin-top: 2rem;
+        }
+        
+        .notification-setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .notification-setting-row:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-setting-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-setting-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .notification-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+        
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification-card.unread {
+            border-left: 3px solid var(--primary-color);
+            background-color: rgba(13, 63, 181, 0.05);
+        }
+        
+        .notification-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .notification-card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .notification-card-date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        .notification-card-message {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Styles responsifs pour différentes tailles d'écran */
+        @media (max-width: 1200px) {
+            .notification-panel {
+                padding: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .notification-panel {
+                padding: 1.5rem;
+            }
+            
+            .notification-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
+            }
+            
+            .notification-title {
+                font-size: 1.5rem;
+            }
+            
+            .notification-description {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .notification-panel {
+                padding: 1.25rem;
+            }
+            
+            .notification-header {
+                margin-bottom: 1.25rem;
+            }
+            
+            .notification-title {
+                font-size: 1.3rem;
+            }
+            
+            .notification-description {
+                margin-bottom: 1.5rem;
+            }
+            
+            .notification-setting-row {
+                padding: 1rem 0;
+                flex-wrap: wrap;
+            }
+            
+            .notification-toggle {
+                margin-top: 0.5rem;
+            }
+            
+            .notification-setting-label {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .notification-panel {
+                padding: 1rem;
+                border-radius: 15px;
+            }
+            
+            .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            
+            .notification-title {
+                font-size: 1.2rem;
+            }
+            
+            .notification-setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .notification-toggle {
+                align-self: flex-start;
+            }
+            
+            .notification-card {
+                padding: 1rem;
+            }
+            
+            .notification-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            
+            .push-subscription-button {
+                width: 100%;
+                text-align: center;
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="notification-panel">
+    <div class="notification-header">
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <h1 class="notification-title">Gestion des Notifications</h1>
+    </div>
+
+    <div class="notification-description">
+        Recevez des notifications importantes concernant vos cours, notes, examens et délibérations, même lorsque vous n'êtes pas sur l'application.
+    </div>
+
+    <div id="push-status" class="notification-status">
+        <i class="fas fa-spinner fa-spin"></i> Vérification de l'état des notifications...
+    </div>
+
+    <button id="push-subscription-button" class="push-subscription-button" disabled>
+        <i class="fas fa-bell"></i> Chargement...
+    </button>
+
+    <div class="notification-settings">
+        <h2>Paramètres des notifications</h2>
+        
+        <div class="notification-setting-row">
+            <div>
+                <div class="notification-setting-label">Nouvelles notes</div>
+                <div class="notification-setting-description">Soyez notifié lorsqu'une nouvelle note est publiée</div>
+            </div>
+            <label class="notification-toggle">
+                <input type="checkbox" id="notification-grades" checked data-notification-type="grades">
+                <span class="notification-slider"></span>
+            </label>
+        </div>
+
+        <div class="notification-setting-row">
+            <div>
+                <div class="notification-setting-label">Délibérations</div>
+                <div class="notification-setting-description">Soyez notifié des résultats de délibérations</div>
+            </div>
+            <label class="notification-toggle">
+                <input type="checkbox" id="notification-deliberations" checked data-notification-type="deliberations">
+                <span class="notification-slider"></span>
+            </label>
+        </div>
+
+        <div class="notification-setting-row">
+            <div>
+                <div class="notification-setting-label">Annonces importantes</div>
+                <div class="notification-setting-description">Soyez notifié des annonces administratives</div>
+            </div>
+            <label class="notification-toggle">
+                <input type="checkbox" id="notification-announcements" checked data-notification-type="announcements">
+                <span class="notification-slider"></span>
+            </label>
+        </div>
+
+        <div class="notification-setting-row">
+            <div>
+                <div class="notification-setting-label">Événements du calendrier</div>
+                <div class="notification-setting-description">Soyez notifié des changements dans le calendrier académique</div>
+            </div>
+            <label class="notification-toggle">
+                <input type="checkbox" id="notification-calendar" checked data-notification-type="calendar">
+                <span class="notification-slider"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="notification-panel notification-history">
+    <div class="notification-header">
+        <div class="notification-icon">
+            <i class="fas fa-history"></i>
+        </div>
+        <h2 class="notification-title">Historique des Notifications</h2>
+    </div>
+
+    <div id="notification-history-container">
+        {% if notifications %}
+            {% for notification in notifications %}
+                <div class="notification-card {% if not notification.read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+                    <div class="notification-card-header">
+                        <div class="notification-card-title">{{ notification.title }}</div>
+                        <div class="notification-card-date">{{ notification.created_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    <div class="notification-card-message">{{ notification.message }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune notification récente</p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="/static/pwa/push-notifications.js" defer></script>
+
+<script>
+// Gestionnaire pour les options de notification
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationToggles = document.querySelectorAll('[data-notification-type]');
+    
+    notificationToggles.forEach(toggle => {
+        toggle.addEventListener('change', async (event) => {
+            const type = event.target.dataset.notificationType;
+            const enabled = event.target.checked;
+            
+            try {
+                const token = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                await fetch('/api/push/preferences/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': token
+                    },
+                    body: JSON.stringify({
+                        type,
+                        enabled
+                    })
+                });
+                
+                // Afficher une confirmation de la mise à jour
+                if (window.pushManager) {
+                    window.pushManager.displayLocalNotification(
+                        'Préférences mises à jour',
+                        `Les notifications pour "${type}" sont ${enabled ? 'activées' : 'désactivées'}`
+                    );
+                }
+            } catch (error) {
+                console.error('Erreur lors de la mise à jour des préférences:', error);
+                // Rétablir l'état précédent en cas d'erreur
+                event.target.checked = !enabled;
+            }
+        });
+    });
+    
+    // Marquer les notifications comme lues lors du clic
+    const notificationCards = document.querySelectorAll('.notification-card');
+    notificationCards.forEach(card => {
+        card.addEventListener('click', async () => {
+            const notificationId = card.dataset.notificationId;
+            if (!notificationId) return;
+            
+            try {
+                const token = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                await fetch(`/api/notifications/${notificationId}/read/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': token
+                    }
+                });
+                
+                // Mettre à jour l'UI
+                card.classList.remove('unread');
+            } catch (error) {
+                console.error('Erreur lors du marquage de la notification comme lue:', error);
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

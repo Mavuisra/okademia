@@ -1,0 +1,403 @@
+{% extends "belletin/base.html" %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #1e3c72;
+        --secondary-color: #ffa502;
+        --background-color: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --stat-blue: #2196F3;
+        --stat-green: #4CAF50;
+        --stat-orange: #FF9800;
+        --stat-red: #F44336;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .welcome-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+    .stat-blue::before {
+        background-color: var(--stat-blue);
+    }
+
+    .stat-green::before {
+        background-color: var(--stat-green);
+    }
+
+    .stat-orange::before {
+        background-color: var(--stat-orange);
+    }
+
+    .stat-red::before {
+        background-color: var(--stat-red);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-blue .stat-value {
+        color: var(--stat-blue);
+    }
+
+    .stat-green .stat-value {
+        color: var(--stat-green);
+    }
+
+    .stat-orange .stat-value {
+        color: var(--stat-orange);
+    }
+
+    .stat-red .stat-value {
+        color: var(--stat-red);
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 2px solid #eee;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .badge-pending {
+        background-color: #ffecb3;
+        color: #f57c00;
+    }
+
+    .badge-progress {
+        background-color: #b3e5fc;
+        color: #0288d1;
+    }
+
+    .badge-completed {
+        background-color: #c8e6c9;
+        color: #388e3c;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2a5298);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .btn-outline:hover {
+        background: rgba(30, 60, 114, 0.1);
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #666;
+        background: #f5f5f5;
+        transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+        background: #e0e0e0;
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Tableau de Bord du Jury</h2>
+            <p class="welcome-message">Bienvenue, {{ jury_member.user.get_full_name }}{% if is_president %} (Président){% endif %}</p>
+        </div>
+        <div>
+            {% if is_president %}
+            <a href="{% url 'belletin:jury_create_deliberation' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nouvelle Délibération
+            </a>
+            {% endif %}
+            <a href="{% url 'belletin:jury_deliberations_list' %}" class="btn btn-outline">
+                Toutes les Délibérations
+            </a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-blue">
+            <div class="stat-value">{{ stats.total_students }}</div>
+            <div class="stat-label">Étudiants Total</div>
+        </div>
+        <div class="stat-card stat-orange">
+            <div class="stat-value">{{ stats.pending_deliberations }}</div>
+            <div class="stat-label">Délibérations en Attente</div>
+        </div>
+        <div class="stat-card stat-green">
+            <div class="stat-value">{{ stats.in_progress_deliberations }}</div>
+            <div class="stat-label">Délibérations en Cours</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Délibérations à venir</h2>
+            {% if is_president %}
+            <a href="{% url 'belletin:jury_create_deliberation' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Créer une délibération
+            </a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if deliberations %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Promotion</th>
+                            <th>Semestre</th>
+                            <th>Date prévue</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for delib in deliberations %}
+                        <tr>
+                            <td>{{ delib.promotion }}</td>
+                            <td>{{ delib.get_semester_display }}</td>
+                            <td>{{ delib.date_scheduled|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if delib.status == 'PENDING' %}
+                                <span class="status-badge badge-pending">En attente</span>
+                                {% elif delib.status == 'IN_PROGRESS' %}
+                                <span class="status-badge badge-progress">En cours</span>
+                                {% elif delib.status == 'COMPLETED' %}
+                                <span class="status-badge badge-completed">Terminée</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'belletin:jury_deliberation_detail' deliberation_token=delib.token %}" class="action-btn">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">Aucune délibération à venir.</p>
+            {% endif %}
+            <div class="text-center mt-3">
+                <a href="{% url 'belletin:jury_deliberations_list' %}" class="btn btn-outline">
+                    <i class="fas fa-list"></i> Voir toutes les délibérations
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Délibérations récentes terminées</h2>
+        </div>
+        <div class="card-body">
+            {% if recent_completed %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Promotion</th>
+                            <th>Semestre</th>
+                            <th>Date de fin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for delib in recent_completed %}
+                        <tr>
+                            <td>{{ delib.promotion }}</td>
+                            <td>{{ delib.get_semester_display }}</td>
+                            <td>{{ delib.date_completed|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'belletin:jury_deliberation_detail' deliberation_token=delib.token %}" class="action-btn">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'belletin:jury_export_pv' deliberation_token=delib.token %}" class="action-btn" title="Télécharger PV">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">Aucune délibération récente terminée.</p>
+            {% endif %}
+            <div class="text-center mt-3">
+                <a href="{% url 'belletin:jury_deliberations_list' %}?status=COMPLETED" class="btn btn-outline">
+                    <i class="fas fa-history"></i> Voir toutes les délibérations terminées
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

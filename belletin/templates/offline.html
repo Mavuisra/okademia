@@ -1,0 +1,17 @@
+{% extends "belletin/base.html" %}
+
+{% block content %}
+<div class="container text-center">
+    <div class="py-5">
+        <h1 class="display-4">Vous êtes hors ligne</h1>
+        <div class="my-4">
+            <i class="fas fa-wifi fa-5x text-muted"></i>
+        </div>
+        <p class="lead">Impossible d'accéder au contenu demandé car vous n'êtes pas connecté à Internet.</p>
+        <p>Ne vous inquiétez pas, le contenu que vous avez déjà consulté est disponible. Essayez de naviguer vers une autre page que vous avez récemment visitée.</p>
+        <div class="mt-4">
+            <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

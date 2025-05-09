@@ -1,0 +1,390 @@
+{% extends "belletin/base_print.html" %}
+
+{% block extra_head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    body {
+        font-family: 'Arial', sans-serif;
+        font-size: 12pt;
+        line-height: 1.6;
+        color: #333;
+    }
+    .bulletin-container {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 15mm;
+        margin: 0 auto;
+        background-color: white;
+        position: relative;
+    }
+    .bulletin-header {
+        text-align: center;
+        margin-bottom: 10mm;
+        border-bottom: 2px solid #1e40af;
+        padding-bottom: 5mm;
+    }
+    .university-logo {
+        max-width: 50mm;
+        margin: 0 auto 5mm;
+    }
+    .bulletin-title {
+        font-size: 18pt;
+        font-weight: bold;
+        margin-bottom: 3mm;
+        color: #1e3a8a;
+    }
+    .student-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5mm;
+        margin-bottom: 10mm;
+        padding: 5mm;
+        background-color: #f8fafc;
+        border-radius: 3mm;
+    }
+    .section-title {
+        font-size: 14pt;
+        font-weight: bold;
+        margin: 5mm 0 3mm;
+        color: #1e3a8a;
+        border-bottom: 1px solid #cbd5e1;
+        padding-bottom: 1mm;
+    }
+    .grades-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10mm;
+    }
+    .grades-table th, .grades-table td {
+        border: 1px solid #cbd5e1;
+        padding: 2mm;
+        text-align: left;
+    }
+    .grades-table th {
+        background-color: #f1f5f9;
+        font-weight: bold;
+    }
+    .semester-header {
+        background-color: #dbeafe;
+        font-weight: bold;
+    }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5mm;
+        margin-bottom: 10mm;
+    }
+    .summary-box {
+        background-color: #f8fafc;
+        border-radius: 3mm;
+        padding: 3mm;
+    }
+    .decision-box {
+        text-align: center;
+        padding: 5mm;
+        margin: 5mm 0;
+        border: 2px solid #1e40af;
+        border-radius: 3mm;
+        font-weight: bold;
+        font-size: 16pt;
+    }
+    .decision-admitted {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    .decision-remedial {
+        background-color: #fef9c3;
+        color: #854d0e;
+    }
+    .decision-failed {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    .signature-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20mm;
+        margin-top: 20mm;
+    }
+    .signature-box {
+        text-align: center;
+    }
+    .signature-line {
+        margin: 15mm 0 3mm;
+        border-top: 1px solid #000;
+    }
+    .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 60pt;
+        opacity: 0.05;
+        color: #1e40af;
+        white-space: nowrap;
+    }
+    .percentage-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        margin-top: 3px;
+    }
+    .percentage-progress {
+        height: 100%;
+        border-radius: 4px;
+        background-color: #3b82f6;
+    }
+    .percentage-label {
+        font-size: 10pt;
+        color: #64748b;
+        text-align: right;
+    }
+    .courses-to-retake {
+        background-color: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 0 3px 3px 0;
+    }
+    .course-warning {
+        color: #b45309;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<body class="bg-white" onload="window.print()">
+    <div class="bulletin-container">
+        <!-- Watermark -->
+        <div class="watermark">{{ student.promotion.department.faculty.name }}</div>
+        
+        <!-- Header section -->
+        <div class="bulletin-header">
+            <h1 class="bulletin-title">UNIVERSITÉ DE KINSHASA</h1>
+            <p class="font-semibold">{{ student.promotion.department.faculty.name }}</p>
+            <p>{{ student.promotion.department.name }}</p>
+            <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/b/b4/Universit%C3%A9_de_Kinshasa_-_Blason.svg/1200px-Universit%C3%A9_de_Kinshasa_-_Blason.svg.png" alt="UNIKIN Logo" class="university-logo">
+        </div>
+        
+        <!-- Bulletin title -->
+        <h2 class="bulletin-title text-center">RELEVÉ DE NOTES ET DÉCISION DU JURY</h2>
+        <p class="text-center mb-6">Année Académique {{ deliberation.academic_year }}</p>
+        
+        <!-- Student information -->
+        <div class="student-info">
+            <div>
+                <p><strong>Nom, Postnom et Prénom:</strong> {{ student.user.get_full_name }}</p>
+                <p><strong>Matricule:</strong> {{ student.matricule }}</p>
+                <p><strong>Promotion:</strong> {{ student.promotion.get_level_display }}</p>
+            </div>
+            <div>
+                <p><strong>Département:</strong> {{ student.promotion.department.name }}</p>
+                <p><strong>Faculté:</strong> {{ student.promotion.department.faculty.name }}</p>
+                {% if student_deliberation.final_decision == 'REMEDIAL' %}
+                <p class="font-bold text-amber-600">(Rattrapage)</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Grades table -->
+        <h3 class="section-title">Résultats Académiques</h3>
+        <table class="grades-table">
+            <thead>
+                <tr>
+                    <th>Code UE</th>
+                    <th>Intitulé des UE</th>
+                    <th>Crédit</th>
+                    <th>CC</th>
+                    <th>MC</th>
+                    <th>Moyenne</th>
+                    <th>Résultat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Regroupement par semestre -->
+                {% regroup grades by ue.semester as semester_list %}
+                
+                {% for semester in semester_list %}
+                <tr class="semester-header">
+                    <td colspan="7">SEMESTRE {{ semester.grouper }}</td>
+                </tr>
+                    {% for grade in semester.list %}
+                    <tr>
+                        <td>{{ grade.ue.code }}</td>
+                        <td>{{ grade.ue.title }}</td>
+                        <td>{{ grade.ue.credits }}</td>
+                        <td>{{ grade.cc|default_if_none:"" }}</td>
+                        <td>{{ grade.mc|default_if_none:"" }}</td>
+                        <td>
+                            {% if grade.cc is not None and grade.mc is not None %}
+                                {{ grade.moyenne|default:grade.cc|add:grade.mc|floatformat:2 }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if grade.cc is not None and grade.mc is not None %}
+                                {% if grade.resultat %}
+                                    <strong>{{ grade.resultat }}</strong>
+                                {% else %}
+                                    {% with average=grade.moyenne|default_if_none:0 %}
+                                        <strong>{% if average >= 10 %}VALIDÉ{% else %}NON VALIDÉ{% endif %}</strong>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Semester summaries -->
+        <div class="summary-grid">
+            <div class="summary-box">
+                <h4 class="font-bold">Semestre 1</h4>
+                <p>Moyenne: <strong>{{ semester1_average|default:"--"|floatformat:2 }}</strong></p>
+                <p>Crédits validés: <strong>{{ semester1_credits|default:"0" }}/{{ semester1_total_credits|default:"0" }}</strong></p>
+                <div style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; margin-top: 3px;">
+                    <div style="height: 100%; border-radius: 4px; background-color: #3b82f6; width: {{ semester1_percentage|floatformat:0 }}%;"></div>
+                </div>
+                <div style="font-size: 10pt; color: #64748b; text-align: right;">{{ semester1_percentage|floatformat:1 }}%</div>
+            </div>
+            <div class="summary-box">
+                <h4 class="font-bold">Semestre 2</h4>
+                <p>Moyenne: <strong>{{ semester2_average|default:"--"|floatformat:2 }}</strong></p>
+                <p>Crédits validés: <strong>{{ semester2_credits|default:"0" }}/{{ semester2_total_credits|default:"0" }}</strong></p>
+                <div style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; margin-top: 3px;">
+                    <div style="height: 100%; border-radius: 4px; background-color: #3b82f6; width: {{ semester2_percentage|floatformat:0 }}%;"></div>
+                </div>
+                <div style="font-size: 10pt; color: #64748b; text-align: right;">{{ semester2_percentage|floatformat:1 }}%</div>
+            </div>
+            <div class="summary-box">
+                <h4 class="font-bold">Total Annuel</h4>
+                <p>Points: <strong>{{ total_points|default:"0"|floatformat:1 }} / {{ max_points|default:"0" }}</strong></p>
+                <p>Pourcentage: <strong>{{ success_percentage|floatformat:1 }}%</strong></p>
+                <div style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; margin-top: 3px;">
+                    <div style="height: 100%; border-radius: 4px; background-color: #3b82f6; width: {{ success_percentage|floatformat:0 }}%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overall results -->
+        <h3 class="section-title">Synthèse Générale</h3>
+        <div class="grid grid-cols-3 gap-5">
+            <div>
+                <p>Total crédits capitalisés: <strong>{{ total_credits_obtained }}</strong>/{{ total_credits_available }}</p>
+                <p>Taux de validation: <strong>{{ credit_percentage|floatformat:1 }}%</strong></p>
+                <div class="percentage-bar">
+                    <div class="percentage-progress" style="width: {{ credit_percentage|floatformat:0 }}%"></div>
+                </div>
+            </div>
+            <div>
+                <p>Crédits à compléter: <strong>{{ credits_to_complete|default:"0" }}</strong></p>
+                <p>Moyenne annuelle: <strong>{{ student_deliberation.average|floatformat:2 }}</strong></p>
+                <p>Appréciation: 
+                    <strong>
+                    {% if student_deliberation.average >= 16 %}
+                        Très Bien
+                    {% elif student_deliberation.average >= 14 %}
+                        Bien
+                    {% elif student_deliberation.average >= 12 %}
+                        Assez Bien
+                    {% elif student_deliberation.average >= 10 %}
+                        Passable
+                    {% else %}
+                        Insuffisant
+                    {% endif %}
+                    </strong>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Courses to retake section -->
+        {% if has_courses_to_retake %}
+        <div class="courses-to-retake my-4">
+            <h4 class="font-bold course-warning">Unités d'Enseignement à Racheter:</h4>
+            <p class="text-sm">L'étudiant a validé {{ total_credits_obtained }} crédits sur {{ total_credits_available }}, dépassant le minimum requis ({{ minimum_credits_for_promotion }}) pour passer en classe supérieure. Cependant, les cours suivants doivent être repris et validés:</p>
+            <ul class="list-disc pl-5 mt-2">
+                {% for course in courses_to_retake %}
+                <li><strong>{{ course.ue.code }}</strong> - {{ course.ue.title }} ({{ course.ue.credits }} crédits) - Note: {{ course.average|floatformat:2 }}/20</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% elif total_credits_obtained < minimum_credits_for_promotion %}
+        <div class="courses-to-retake my-4" style="border-left-color: #ef4444;">
+            <h4 class="font-bold" style="color: #b91c1c;">Crédits Insuffisants pour Passer en Classe Supérieure</h4>
+            <p class="text-sm">L'étudiant n'a validé que {{ total_credits_obtained }} crédits sur {{ total_credits_available }} (minimum requis: {{ minimum_credits_for_promotion }}). Tous les cours suivants doivent être repris:</p>
+            <ul class="list-disc pl-5 mt-2">
+                {% for course in courses_to_retake %}
+                <li><strong>{{ course.ue.code }}</strong> - {{ course.ue.title }} ({{ course.ue.credits }} crédits) - Note: {{ course.average|floatformat:2 }}/20</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Decision -->
+        <div class="decision-box 
+            {% if student_deliberation.final_decision == 'ADMITTED' %}decision-admitted
+            {% elif student_deliberation.final_decision == 'REMEDIAL' %}decision-remedial
+            {% else %}decision-failed{% endif %}">
+            {% if student_deliberation.final_decision == 'ADMITTED' %}
+                ADMIS(E)
+                {% if has_courses_to_retake %}
+                <div class="text-sm font-normal mt-1">Avec obligation de racheter les cours non validés</div>
+                {% endif %}
+            {% elif student_deliberation.final_decision == 'REMEDIAL' %}
+                RATTRAPAGE
+            {% else %}
+                AJOURNÉ(E)
+                {% if total_credits_obtained < minimum_credits_for_promotion %}
+                <div class="text-sm font-normal mt-1">Crédits insuffisants ({{ total_credits_obtained }}/{{ minimum_credits_for_promotion }})</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <!-- Explication détaillée de la décision -->
+        <div class="summary-box p-4 my-4 text-sm">
+            <h4 class="font-bold text-base mb-2">Détail de la décision du jury</h4>
+            <p>{{ decision_explanation }}</p>
+            <p class="mt-2">
+                <span class="font-semibold">Critères de passage:</span>
+                <ul class="list-disc pl-6 mt-1">
+                    <li>Admission: Obtenir au moins 45 crédits sur 60</li>
+                    <li>Rattrapage: Entre 40 et 44 crédits avec une moyenne annuelle ≥ 8/20</li>
+                    <li>Redoublement: Moins de 40 crédits OU moyenne annuelle < 8/20</li>
+                </ul>
+            </p>
+        </div>
+        
+        <!-- Date and signatures -->
+        <div class="text-right mt-8">
+            <p>Fait à Kinshasa, le {{ date|date:"d/m/Y" }}</p>
+        </div>
+        
+        <div class="signature-section">
+            <div class="signature-box">
+                <p class="font-bold">Le Chef de Département</p>
+                <div class="signature-line"></div>
+                <p>Prof. _________________________</p>
+            </div>
+            <div class="signature-box">
+                <p class="font-bold">Le Doyen de la Faculté</p>
+                <div class="signature-line"></div>
+                <p>Prof. _________________________</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-xs mt-10">
+            <p>Ce document n'est valable qu'avec le cachet de l'institution</p>
+        </div>
+    </div>
+</body>
+{% endblock %} 
